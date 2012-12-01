@@ -20,4 +20,3 @@
 
 - Send email on Person creation
     - When a user adds a new Person, send that Person an email with a unique link they can use to create their own account
-
