@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<p class="lead">Welcome to Christmas 2012 Gift Tracker</p>
+<p>You've been invited to join by a friend who is using the site to plan gifts for you.  Once you create your account, you'll be able to set up a list of gifts that you want, and anyone who is planning on giving you a gift this holiday season will be able to see your list.  You'll also be able to see lists anyone on <em>your</em> list has created, and reserve gifts so that no one else gets them the same thing.</p>
+<hr>
+<form action='.' method='POST'>
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Sign Up" class="btn">
+</form>
+{% endblock %}

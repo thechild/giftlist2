@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row-fluid">
+    <div class="span10">
+        <p class="lead">{{ add_title }}</p>
+        <hr>
+    </div>
+    <div class="span2"></div>
+</div>
+<form action='.' method='post' class="form-horizontal">
+    <div class="row-fluid">
+        <div class="span4">
+            {% csrf_token %}
+            {{ form.as_p }}
+        </div>
+        <div class="span4">
+            <p>{{ add_description }}</p>
+            <br><br>
+            <input type='submit' value='Add' class='btn btn-block btn-primary'>
+        </div>
+        <div class="span2"></div>
+    </div>
+</form>
+{% endblock %}

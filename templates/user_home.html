@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Merry Christmas!</h2>
+<p>Welcome to the gift giver.  First, enter some gifts you want in the first section. These will be shown to anyone who wants to give you a gift.  Second, enter the people you want to give gifts to.  If they have already entered gifts, you will be able to see their selections, and reserve one so that no one else buys them the same gift.  If they haven't entered any gifts, you can enter one for them.  Don't worry - they won't see that you've entered or reserved a gift - only you will!</p>
+<br>
+<div class="row-fluid">
+    <h4 class="underline">Gifts I Want</h4>
+    {% for gift in gifts %}
+    <div class="row-fluid">
+        <div class="span5 offset1">
+            <p>{{ gift.title }}</p>
+        </div>
+        <div class="span6">
+            <p><a href="{% url Gifts.views.remove_gift gift.pk %}">[ Remove ]</a></p>
+        </div>
+    </div>
+    {% endfor %}
+    <div class="row-fluid">
+        <div class="span5 offset1">
+            <a href="{% url Gifts.views.add_gift %}">[ + Add a Gift you want ]</a></p>
+        </div>
+        <div class="span6"></div>
+    </div>
+    <br>
+    <h4 class="underline">Gifts I'm Giving</h4>
+    {% for p, g in people_gifts.items %}
+    <div class="row-fluid">
+        <div class="span5 offset1"><a href="{% url Gifts.views.view_user p.pk %}">{{ p.name }}</a></div>
+        {% if g %}
+        <div class="span6"><a href="{% url Gifts.views.view_user p.pk %}">
+        {% if g.count == 1 %}{{ g.0.title }}
+        {% else %}{{ g.count }} items
+        {% endif %}
+        </a></div>
+            {% comment %}
+            <div class="span2">
+                <a href="{% url Gifts.views.unreserve_gift p.pk g.pk %}">[ Unreserve ]</a>
+            </div>
+            {% endcomment %}
+        {% else %}
+        <div class="span6"><a href="{% url Gifts.views.view_user p.pk %}">[ Select a Gift ]</a></div>
+        {% endif %}
+    </div>
+    {% endfor %}
+    
+    <div class="row-fluid">
+        <div class="span7 offset1">
+            <a href="{% url Gifts.views.add_person %}">[ + Add a New Person ]</a></p>
+        </div>
+        <div class="span4"></div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<p class='lead'>Are you sure you want to delete the {{ gift.title }} from your gift list?</p>
+{% if gift.reserved_by %}<p><small>Someone has already reserved this gift!  They'll have to keep looking...</small></p>{% endif %}
+<form action='.' method='POST'>
+    {% csrf_token %}
+    <input type='submit' class='btn btn-danger' value='Delete'>&nbsp;&nbsp;
+    <a href="{% url Gifts.views.user_home %}" class="btn">Cancel</a></form>
+{% endblock %}
