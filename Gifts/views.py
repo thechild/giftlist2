@@ -133,8 +133,7 @@ def add_person(request):
             # send an email letting them know how to sign up:
 
             email_subject = "You've been invited to Gift Exchange!"
-            email_body = "Your friend %s has invited you to share gift lists on Gift Exchange, a simple service Chris Child put together for this Christmas.  Click this link to learn more and sign up:\n%s"
-                % (myself.name(), new_person.signup_url())
+            email_body = "Your friend %s has invited you to share gift lists on Gift Exchange, a simple service Chris Child put together for this Christmas.  Click this link to learn more and sign up:\n%s" % (myself.name(), new_person.signup_url())
             send_mail(email_subject, email_body, 'thechild+giftexchange@gmail.com', [new_person.email, 'thechild+giftexchange@gmail.com'], fail_silently=True)
             return HttpResponseRedirect(reverse('Gifts.views.user_home'))
     else:
