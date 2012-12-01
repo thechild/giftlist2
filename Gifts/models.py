@@ -49,6 +49,7 @@ class Person(models.Model):
     last_name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     creation_key = models.CharField(max_length=150, default=make_uuid)
+    recipients = models.ManyToManyField("self", symmetrical=False)
 
     def signup_url(self):
         return 'http://%s%s' % (socket.gethostname(), reverse('Gifts.views.new_user_signup', args=(self.creation_key,)))

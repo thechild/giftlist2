@@ -63,7 +63,8 @@ def new_user_signup(request, user_key):
 def user_home(request):
     myself = get_person_from_user(request.user)
     gifts = Gift.objects.filter(recipient = myself).exclude(secret = True)
-    people = Person.objects.all().exclude(pk = myself.pk) # will eventually replace this with something smarter
+    #people = Person.objects.all().exclude(pk = myself.pk) # will eventually replace this with something smarter
+    people = myself.recipients.all()
 
     people_gifts = {}
     for p in people:
@@ -123,26 +124,6 @@ def add_secret_gift(request, recipient_id):
         'add_description': 'Enter the details of the gift you would like to get for %s.  No one besides you will ever see this information.' % recipient.name()})
 
 @login_required
-def add_person(request):
-    myself = get_person_from_user(request.user)
-
-    if request.method == 'POST':
-        form = PersonForm(request.POST)
-        if form.is_valid():
-            new_person = form.save()
-            # form a relationship eventually, or maybe send an email, etc
-            # send an email letting them know how to sign up:
-            send_signup_email(myself, new_person)
-            return HttpResponseRedirect(reverse('Gifts.views.user_home'))
-    else:
-        form = PersonForm()
-
-    return render(request,'add_item.html',
-        {'form': form,
-        'add_title': 'Add a new person you would like to give a gift to.',
-        'add_description': "By adding a new person, you can track what gift you'd like to give them.  This will also send them an email inviting them to join Gift Exchange so that you can see the gifts they want."})
-
-@login_required
 def remove_gift(request, gift_id):
     myself = get_person_from_user(request.user)
     gift = get_object_or_404(Gift, pk=gift_id)
@@ -200,13 +181,73 @@ def unreserve_gift(request, recipient_id, gift_id):
 
     return HttpResponseRedirect(reverse('Gifts.views.view_user', args=(recipient.pk,)))
 
+#####################################
+#### Following and Adding People ####
+#####################################
+
+@login_required
+def add_person(request):
+    myself = get_person_from_user(request.user)
+
+    if request.method == 'POST':
+        form = PersonForm(request.POST)
+        if form.is_valid():
+            new_person = form.save()
+            myself.recipients.add(new_person)
+            # form a relationship eventually, or maybe send an email, etc
+            # send an email letting them know how to sign up:
+            send_signup_email(myself, new_person)
+            return HttpResponseRedirect(reverse('Gifts.views.view_all_people'))
+    else:
+        form = PersonForm()
+
+    return render(request,'add_item.html',
+        {'form': form,
+        'add_title': 'Add a new person you would like to give a gift to.',
+        'add_description': "By adding a new person, you can track what gift you'd like to give them.  This will also send them an email inviting them to join Gift Exchange so that you can see the gifts they want."})
+
+@login_required
+def view_all_people(request):
+    myself = get_person_from_user(request.user)
+    all_people = Person.objects.exclude(pk=myself.pk).order_by('first_name', 'last_name')
+    
+    people = []
+    for person in all_people:
+        people.append((person, myself.recipients.filter(pk=person.pk).count() > 0))
+
+    print 'people: %s' % people
+    return render(request, 'view_all_people.html', { 'myself': myself, 'people': people })
+
+@login_required
+def follow_person(request, person_id):
+    myself = get_person_from_user(request.user)
+    person = get_object_or_404(Person, pk=person_id)
+    if myself.recipients.filter(pk=person.pk).count() > 0:
+        messages.warning(request, "You've already added %s to your gift list!" % person.name())
+    else:
+        myself.recipients.add(person)
+        messages.success(request, "%s is now on your gift list! Pick them out something nice!" % person.name())
+    return HttpResponseRedirect(reverse('Gifts.views.view_all_people'))
+
+@login_required
+def unfollow_person(request, person_id):
+    myself = get_person_from_user(request.user)
+    person = get_object_or_404(Person, pk=person_id)
+    if myself.recipients.filter(pk=person.pk).count() > 0:
+        myself.recipients.remove(person)
+        cleared_gifts = clear_reserved_gifts(myself, person)
+        messages.success(request, "Removed %s from your list, and unreserved any gifts you had reserved for them." % person.name())
+    else:
+        messages.warning(request, "You weren't following %s." % person.name())
+    return HttpResponseRedirect(reverse('Gifts.views.view_all_people'))
+
 @login_required
 def view_user(request, user_id):
     myself = get_person_from_user(request.user)
     user = get_object_or_404(Person, pk=user_id)
     reserved_gifts = [g.pk for g in get_reserved_gifts(myself, user)]
 
-    gifts = Gift.objects.filter(recipient=user).filter(Q(secret=False) | Q(pk__in=reserved_gifts)) # may want a way to put things in without reserving them...
+    gifts = Gift.objects.filter(recipient=user).filter(Q(secret=False) | Q(pk__in=reserved_gifts))
 
     return render(request, 'view_user.html',{
         'user' : user,
