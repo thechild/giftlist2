@@ -11,6 +11,7 @@ from datetime import datetime
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.forms import UserCreationForm
+from django.core import send_mail
 
 def home(request):
     return HttpResponseRedirect(reverse('Gifts.views.user_home'))
@@ -41,8 +42,6 @@ def new_user_signup(request, user_key):
             person.save()
             messages.success(request,"Your account is all set up, and you're now logged in.")
             return HttpResponseRedirect(reverse('Gifts.views.user_home'))
-        else:
-            print "form wasn't valid"
     else:
         try:
             user = User.objects.get(email__exact=person.email)
@@ -56,8 +55,6 @@ def new_user_signup(request, user_key):
             form = UserCreateForm()
             form.initial = {'first_name': person.first_name, 'last_name': person.last_name, 'email': person.email}
         
-        print form
-
         return render(request, 'new_user.html',
                 {'form': form})
 
@@ -126,11 +123,19 @@ def add_secret_gift(request, recipient_id):
 
 @login_required
 def add_person(request):
+    myself = get_person_from_user(request.user)
+
     if request.method == 'POST':
         form = PersonForm(request.POST)
         if form.is_valid():
             new_person = form.save()
             # form a relationship eventually, or maybe send an email, etc
+            # send an email letting them know how to sign up:
+
+            email_subject = "You've been invited to Gift Exchange!"
+            email_body = "Your friend %s has invited you to share gift lists on Gift Exchange, a simple service Chris Child put together for this Christmas.  Click this link to learn more and sign up:\n%s"
+                % (myself.name(), new_person.signup_url())
+            send_mail(email_subject, email_body, 'thechild+giftexchange@gmail.com', [new_person.email, 'thechild+giftexchange@gmail.com'], fail_silently=True)
             return HttpResponseRedirect(reverse('Gifts.views.user_home'))
     else:
         form = PersonForm()
