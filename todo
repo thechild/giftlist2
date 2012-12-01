@@ -1,6 +1,3 @@
-- Send email on Person creation
-    - When a user adds a new Person, send that Person an email with a unique link they can use to create their own account
-
 - Person-Person relationships
     - Don't show every Person to all users
     - When you add a person, first require searching existing people, then allow adding a new person
@@ -20,3 +17,7 @@
     - When someone comes to the site via a link in an email, have them create an account and tie it to the Person that was created when someone entered their email address
 
 - Get running on Heroku
+
+- Send email on Person creation
+    - When a user adds a new Person, send that Person an email with a unique link they can use to create their own account
+

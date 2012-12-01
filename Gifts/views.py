@@ -11,7 +11,8 @@ from datetime import datetime
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.forms import UserCreationForm
-from django.core import send_mail
+from django.core.mail import EmailMultiAlternatives
+from Gifts.helpers import send_signup_email
 
 def home(request):
     return HttpResponseRedirect(reverse('Gifts.views.user_home'))
@@ -131,10 +132,7 @@ def add_person(request):
             new_person = form.save()
             # form a relationship eventually, or maybe send an email, etc
             # send an email letting them know how to sign up:
-
-            email_subject = "You've been invited to Gift Exchange!"
-            email_body = "Your friend %s has invited you to share gift lists on Gift Exchange, a simple service Chris Child put together for this Christmas.  Click this link to learn more and sign up:\n%s" % (myself.name(), new_person.signup_url())
-            send_mail(email_subject, email_body, 'thechild+giftexchange@gmail.com', [new_person.email, 'thechild+giftexchange@gmail.com'], fail_silently=True)
+            send_signup_email(myself, new_person)
             return HttpResponseRedirect(reverse('Gifts.views.user_home'))
     else:
         form = PersonForm()
@@ -142,7 +140,7 @@ def add_person(request):
     return render(request,'add_item.html',
         {'form': form,
         'add_title': 'Add a new person you would like to give a gift to.',
-        'add_description': "By adding a new person, you can track what gift you'd like to give them."})
+        'add_description': "By adding a new person, you can track what gift you'd like to give them.  This will also send them an email inviting them to join Gift Exchange so that you can see the gifts they want."})
 
 @login_required
 def remove_gift(request, gift_id):
