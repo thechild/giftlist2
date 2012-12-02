@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from uuid import uuid4
-import socket
+import os
 
 # this should rarely run
 def get_person_from_user(user):
