@@ -6,3 +6,7 @@
 .no-border {
     border-top: none;
 }
+
+.help-block {
+    display: none;
+}

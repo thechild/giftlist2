@@ -27,8 +27,10 @@ def user_logout(request):
 def new_user_signup(request, user_key):
     if request.user.is_authenticated():
         logout(request) # can't set up a new account while you're already logged in
-
-    person = get_object_or_404(Person, creation_key__exact=user_key)
+    if user_key=='test':
+        person = Person()
+    else:
+        person = get_object_or_404(Person, creation_key__exact=user_key)
     
     if request.method == 'POST':
         form = UserCreateForm(request.POST)

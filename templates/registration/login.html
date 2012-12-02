@@ -1,24 +1,26 @@
 {% extends "base.html" %}
-{% load url from future %}
-
+{% load bootstrap_tags %}
 {% block content %}
 <p class="lead">Please log in to access the gift exchange.  If you don't have an account, ask someone with an account to add you to their gift list.</p>
 <hr>
 {% if form.errors %}
 <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
-<form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+<form method="post" action="{% url django.contrib.auth.views.login %}">
 <div class="row-fluid">
-    <div class="span4">
-        {% csrf_token %}
-        {{ form }}
-        <input type="hidden" name="next" value="{{ next }}" >
-    </div>
-</div>
-<br>
-<div class="row-fluid">
-    <div class="span4">
-        <input type="submit" value="   Login   " class="btn btn-primary btn-block">    
+    <div class="span8 offset2">
+        <div class="row-fluid well">
+            <div class="span6">
+                {% csrf_token %}
+                {{ form|as_bootstrap }}
+                <input type="hidden" name="next" value="{{ next }}" >
+                <input type="submit" value="Login" class="btn btn-primary">
+            </div>
+            <div class="span5 pull-right">
+                <img class="hidden-phone" src="{{STATIC_URL}}img/gift.png">
+                
+            </div>
+        </div>
     </div>
 </div>
 </form>
