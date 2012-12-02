@@ -2,18 +2,47 @@
 {% block content %}
 
 <div class="row-fluid">
-    <div class="span8">
+    <div class="span9">
         <h1>Happy Holidays!</h1>
         <p>Welcome to the gift giver.  First, enter some gifts you want in the first section. These will be shown to anyone who wants to give you a gift.  Second, enter the people you want to give gifts to.  If they have already entered gifts, you will be able to see their selections, and reserve one so that no one else buys them the same gift.  If they haven't entered any gifts, you can enter one for them.  Don't worry - they won't see that you've entered or reserved a gift - only you will!</p>
     </div>
-    <div class="span4">
+    <div class="span3 pull-right">
         <img src="{{STATIC_URL}}img/gift.png">
     </div>
 </div>
 <br>
 <div class="row-fluid">
     <h4 class="underline">Gifts I Want</h4>
-    {% for gift in gifts %}
+    <div class="span11 offset1">
+        {% for gift in gifts %}
+        <div class="row-fluid">
+            <div class="span4">
+                {% if gift.url %}<a href="{{ gift.url }}">{{ gift.title }}</a>{% else %}{{ gift.title }}{% endif %}
+            </div>
+            <div class="span4">{{gift.description}}</div>
+            <div class="span2">{{gift.price}}</div>
+            <div class="span2">
+                <div class="btn-group pull-right">
+                    <a class="btn dropdown-toggle btn-small" data-toggle="dropdown" href="#">
+                        Modify
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a tabindex="-1" href="#">Edit</a></li>
+                        <li><a href="{% url Gifts.views.remove_gift gift.pk %}">Remove</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <br>
+        <div class="row-fluid">
+            <div class="span4 offset8">
+                <a class="btn btn-primary pull-right" href="{% url Gifts.views.add_gift %}">Add a Gift you want</a>
+            </div>
+        </div>
+    </div>
+{% comment %}
     <div class="row-fluid">
         <div class="span5 offset1">
             <p>{{ gift.title }}</p>
@@ -29,6 +58,7 @@
         </div>
         <div class="span6"></div>
     </div>
+    {% endcomment %}
     <br>
     <h4 class="underline">Gifts I'm Giving</h4>
     {% for p, g in people_gifts.items %}
