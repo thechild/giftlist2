@@ -81,23 +81,41 @@ def user_home(request):
         })
 
 @login_required
-def add_gift(request):
+def add_gift(request, gift_id=None):
     myself = get_person_from_user(request.user)
+    if gift_id:
+        gift = get_object_or_404(Gift, pk=gift_id)
+        if gift.recipient != myself:
+            messages.error(request, "You don't have permission to edit that gift.")
+            return HttpResponseRedirect(reverse('Gifts.views.user_home'))
+    else:
+        gift = None
 
     if request.method == 'POST':
-        form = GiftForm(request.POST)
+        form = GiftForm(request.POST, instance=gift)
         if form.is_valid():
             new_gift = form.save(commit=False)
             new_gift.recipient = myself
             new_gift.save()
             return HttpResponseRedirect(reverse('Gifts.views.user_home'))
     else:
-        form = GiftForm()
+        form = GiftForm(instance=gift)
+
+    if gift_id:
+        add_title = 'Edit the gift that you want to receive.'
+        submit_text = 'Change'
+    else:
+        add_title = 'Add a new gift to your list.'
+        submit_text = 'Add'
+
+    add_description = "Enter the details of a gift you would like to receive. Note that you can't change this after you save it, since people will be able to immediately reserve it."
 
     return render(request, 'add_item.html',
         {'form': form,
-        'add_title': 'Add a new gift to your list',
-        'add_description': "Enter the details of a gift you would like to receive. Note that you can't change this after you save it, since people will be able to immediately reserve it."})
+        'add_title': add_title,
+        'add_description': add_description,
+        'submit_text': submit_text,
+        'giftid': gift_id })
 
 @login_required
 def add_secret_gift(request, recipient_id):
@@ -193,6 +211,8 @@ def add_person(request):
         form = PersonForm(request.POST)
         if form.is_valid():
             new_person = form.save()
+            new_person.invited_by = myself
+            new_person.save()
             myself.recipients.add(new_person)
             # form a relationship eventually, or maybe send an email, etc
             # send an email letting them know how to sign up:
@@ -254,3 +274,9 @@ def view_user(request, user_id):
         'reserved_gifts' : reserved_gifts,
         'gifts' : gifts,
         })
+
+@login_required
+def manage_account(request):
+    myself = get_person_from_user(request.user)
+    messages.warning(request, "Sorry, this isn't implemented yet.")
+    return HttpResponseRedirect(reverse('Gifts.views.user_home'))

@@ -2,3 +2,7 @@
     border-style: none;
     border-bottom: thin solid DimGray;
 }
+
+.no-border {
+    border-top: none;
+}

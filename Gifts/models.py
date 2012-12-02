@@ -50,6 +50,7 @@ class Person(models.Model):
     email = models.EmailField(unique=True)
     creation_key = models.CharField(max_length=150, default=make_uuid)
     recipients = models.ManyToManyField("self", symmetrical=False)
+    invited_by = models.ForeignKey(User, related_name='invitees', blank=True, null=True)
 
     def signup_url(self):
         return '%s%s' % (os.environ.get('BASE_IRI'), reverse('Gifts.views.new_user_signup', args=(self.creation_key,)))

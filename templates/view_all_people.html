@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="row-fluid">
-    <div class="span10">
+    <div class="span12">
         <p class="lead">Select the people you want on your gift list, or add new people to the system.</p>
         <p>No one will know if they are on your list or not.</p>
         <hr>
@@ -17,8 +17,8 @@
                     <td>{{ person.name }}</td>
                     <td><a href="mailto:{{ person.email }}">{{ person.email }}</a></td>
                     <td>
-                        {% if following %}<a class="btn btn-inverse btn-small" href="{% url Gifts.views.unfollow_person person.pk %}">Remove</a>
-                        {% else %}<a class="btn btn-info btn-small" href="{% url Gifts.views.follow_person person.pk %}">Add</a>
+                        {% if following %}<a class="btn btn-inverse btn-small pull-right" href="{% url Gifts.views.unfollow_person person.pk %}">Remove</a>
+                        {% else %}<a class="btn btn-info btn-small pull-right" href="{% url Gifts.views.follow_person person.pk %}">Add</a>
                         {% endif %}
                     </td>
                 </tr>
@@ -30,11 +30,10 @@
             </tbody>
         </table>
     </div>
-    <div class="span2"></div>
 </div>
 <div class='row-fluid'>
-    <div class="span5 pull-right">
-        <a href="{% url Gifts.views.add_person %}">[ + Add a New Person ]</a></p>
+    <div class="span12">
+        <a class="btn btn-success pull-right" href="{% url Gifts.views.add_person %}">Add a New Person</a></p>
     </div>
 </div>
 {% endblock %}
