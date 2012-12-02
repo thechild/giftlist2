@@ -2,6 +2,9 @@
 {% block content %}
 <div class="row-fluid">
     <div class="span10">
+        <p class="lead">Select the people you want on your gift list, or add new people to the system.</p>
+        <p>No one will know if they are on your list or not.</p>
+        <hr>
         <table class="table table-striped">
             <thead>
                 <th>Name</th>
@@ -34,5 +37,4 @@
         <a href="{% url Gifts.views.add_person %}">[ + Add a New Person ]</a></p>
     </div>
 </div>
-
 {% endblock %}
