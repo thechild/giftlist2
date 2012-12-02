@@ -1,10 +1,13 @@
-- Person-Person relationships
-    - Don't show every Person to all users
-    - When you add a person, first require searching existing people, then allow adding a new person
+- Make user_home show all the gifts for everyone
+    - probably shift to a table for user_home
+- make the sign up form cleaner (it has rules about what to put, etc)
+- get it working where it converts amazon links to my affiliate link
+- add ability to edit gifts I've added (now you have to add)
+- and ability to edit gifts I've requested
+
 
 - Merging people?
     - What happens if two people add someone with different email addresses?  I guess the search ^ should handle that...
-
 
 ###COMPLETED###
 - Enable multiple gifts
@@ -20,3 +23,7 @@
 
 - Send email on Person creation
     - When a user adds a new Person, send that Person an email with a unique link they can use to create their own account
+
+- Person-Person relationships
+    - Don't show every Person to all users
+    - When you add a person, first require searching existing people, then allow adding a new person

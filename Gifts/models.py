@@ -52,7 +52,7 @@ class Person(models.Model):
     recipients = models.ManyToManyField("self", symmetrical=False)
 
     def signup_url(self):
-        return 'http://%s/%s' % (os.environ.get('BASE_IRI'), reverse('Gifts.views.new_user_signup', args=(self.creation_key,)))
+        return '%s%s' % (os.environ.get('BASE_IRI'), reverse('Gifts.views.new_user_signup', args=(self.creation_key,)))
 
     def gifts(self):
         return Gift.objects.filter(recipient=self).exclude(secret=True)
