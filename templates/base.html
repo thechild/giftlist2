@@ -2,10 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Christmas 2012 Gifts</title>
+    <title>2012 Gift Exchange</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
+
+    <link rel="shortcut icon" href="{{STATIC_URL}}img/favicon.ico" />
 
     <link href="{{STATIC_URL}}css/bootstrap.css" rel="stylesheet">
     <style>
@@ -33,7 +35,6 @@
   </head>
 
   <body>
-
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -42,7 +43,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="/">Christmas 2012</a>
+          <a class="brand" href="{% url Gifts.views.user_home %}">Gift Exchange</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li class="{% ifequal request.path 'home/' %}active{% endifequal %}"><a href="/home/">Home</a></li>
@@ -64,9 +65,9 @@
       {% endif %}
     </div>
 
-    <div class="container-fluid">
-      <div class="row-fluid">
-        <div class="span2">
+    <div class="container">
+      <div class="row">
+        <div class="span1">
           {% block sidebar %}
           {% endblock %}
         </div>
@@ -74,7 +75,17 @@
           {% block content %}
           {% endblock %}
         </div>
+        <div class="span1">
+          &nbsp;
+        </div>
       </div>
     </div> <!-- /container -->
+    <!--
+    <div class="navbar navbar-fixed-bottom">
+      <div class="navbar-inner">
+        <p class="navbar-text">Some interesting text<span class="pull-right">and a link</span></p>
+      </div>
+    </div>
+  -->
   </body>
 </html>

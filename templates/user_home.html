@@ -1,7 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Merry Christmas!</h2>
-<p>Welcome to the gift giver.  First, enter some gifts you want in the first section. These will be shown to anyone who wants to give you a gift.  Second, enter the people you want to give gifts to.  If they have already entered gifts, you will be able to see their selections, and reserve one so that no one else buys them the same gift.  If they haven't entered any gifts, you can enter one for them.  Don't worry - they won't see that you've entered or reserved a gift - only you will!</p>
+
+<div class="row-fluid">
+    <div class="span8">
+        <h1>Happy Holidays!</h1>
+        <p>Welcome to the gift giver.  First, enter some gifts you want in the first section. These will be shown to anyone who wants to give you a gift.  Second, enter the people you want to give gifts to.  If they have already entered gifts, you will be able to see their selections, and reserve one so that no one else buys them the same gift.  If they haven't entered any gifts, you can enter one for them.  Don't worry - they won't see that you've entered or reserved a gift - only you will!</p>
+    </div>
+    <div class="span4">
+        <img src="{{STATIC_URL}}img/gift.png">
+    </div>
+</div>
 <br>
 <div class="row-fluid">
     <h4 class="underline">Gifts I Want</h4>
