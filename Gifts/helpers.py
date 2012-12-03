@@ -55,6 +55,7 @@ def send_update_email(sender, recipient):
         c = Context({
             'recipient': recipient,
             'sender': sender,
+            'link': reverse('Gifts.views.view_user', recipient.pk)
             })
 
         text_content = plaintext.render(c)
