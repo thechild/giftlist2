@@ -42,7 +42,7 @@ def new_user_signup(request, user_key):
             print "Created new user name '%s'" % (form['username'], )
             person.login_user = user
             person.save()
-            messages.success(request,"Your account is all set up, and you're now logged in.")
+            messages.success(request,"Your account is all set up, and you're now logged in as '{{user.username}}'.")
             return HttpResponseRedirect(reverse('Gifts.views.user_home'))
     else:
         try:
@@ -51,7 +51,7 @@ def new_user_signup(request, user_key):
             user = None
 
         if user:
-            messages.error(request, "You've already created your account.  Please login below.")
+            messages.error(request, "You've already created your account.  Please login below.  Your user name is '{{ user.username }}'.")
             return HttpResponseRedirect(reverse('django.contrib.auth.views.login'))
         else:
             form = UserCreateForm()
