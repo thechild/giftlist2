@@ -1,12 +1,15 @@
-Hi {{ recipient.first_name }},
+Happy Holidays {{ recipient.first_name }},
 
-Your friend {{ sender.name }} is using Chris Child's gift exchange web app to keep track of gifts this holiday season.  It's a simple website that lets you make a list of what gifts you want, share that list with your friends, and see what gifts your friends want too.  You can even reserve gifts they've asked for (without them knowing!) so that you won't end up getting them the same gift as someone else.
+I'm using Gift Exchange, a simple web app for keeping track of gifts I'm getting people this holiday season, and I'd love for you to join me.
 
-You can set up your own account and check it out at the link below. Once you do, your friends will be able to get you exactly what you want for the holidays!
+It lets you make a list of gifts you want, and see all your friends lists too, so that everyone gets what they want!
+
+Click the link below to log in and let me know what to get you for the holidays!
 
 {{ recipient.signup_url }}
 
+If you have any questions, feel free to reach out to Chris, who built the site, at thechild+giftlist@gmail.com.
+
 Happy Holidays,
 
-Chris Child
-(thechild+giftexchange@gmail.com)
+{{ sender.first_name }}
