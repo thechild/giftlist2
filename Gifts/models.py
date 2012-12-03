@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from uuid import uuid4
 import os
+import helpers
 
 # this should rarely run
 def get_person_from_user(user):
@@ -51,6 +52,9 @@ class Person(models.Model):
     creation_key = models.CharField(max_length=150, default=make_uuid)
     recipients = models.ManyToManyField("self", symmetrical=False)
     invited_by = models.ForeignKey(User, related_name='invitees', blank=True, null=True)
+
+    def send_signup_email(self):
+        helpers.send_signup_email(self.invited_by, self)
 
     def signup_url(self):
         return '%s%s' % (os.environ.get('BASE_IRI'), reverse('Gifts.views.new_user_signup', args=(self.creation_key,)))
