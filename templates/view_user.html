@@ -9,33 +9,33 @@
             <th>Item</th>
             <th>Description</th>
             <th>Price</th>
-            <th>Link</th>
             <th>Select</th>
         </tr>
     </thead>
     <tbody>
         {% for gift in gifts %}
         <tr class="{% if gift.pk in reserved_gifts %}info{% endif %}">
-            <td>{{ gift.title }}{% if gift.secret %} <small class="muted">(Secret)</small>{% endif %}</td>
+            <td>
+                {% if gift.url %}<a href="{{ gift.url }}" target="_blank">{{ gift.title }}</a>{% else %}{{ gift.title }}{% endif %}
+                {% if gift.secret %} <small class="muted">(Secret)</small>{% endif %}</td>
             <td>{{ gift.description }}</td>
             <td>{{ gift.price }}</td>
-            <td><a href="{{ gift.url }}" target="_blank">{% if gift.url %}View{% endif %}</a></td>
             <td>
                 {% if gift.pk in reserved_gifts %}
-                    <a href="{% url Gifts.views.unreserve_gift user.pk gift.pk %}">
-                    {% if gift.secret %}[ Delete ]{% else %}[ Unreserve ]{% endif %}</a>
+                    <a class="btn btn-inverse btn-small" href="{% url Gifts.views.unreserve_gift user.pk gift.pk %}">
+                    {% if gift.secret %}Delete{% else %}Unreserve{% endif %}</a>
                 {% elif gift.reserved_by %}Reserved
-                {% else %}<a href="{% url Gifts.views.reserve_gift user.pk gift.pk %}">[ Reserve ]</a>
+                {% else %}<a class="btn btn-small" href="{% url Gifts.views.reserve_gift user.pk gift.pk %}">Reserve</a>
                 {% endif %}
             </td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan=5>{{ user.first_name }} hasn't selected any gifts yet.  Remind them to, or add your own gift!</td>
+            <td colspan=4>{{ user.first_name }} hasn't selected any gifts yet.  Remind them to, or add your own gift!</td>
         </tr>
         {% endfor %}
         <tr>
-            <td colspan=5><a href="{% url Gifts.views.add_secret_gift user.pk %}">+ Something Else</a></td>
+            <td colspan=4><a class="btn btn-primary btn-small pull-right" href="{% url Gifts.views.add_secret_gift user.pk %}">+ Something Else</a></td>
         </tr>
     </tbody>
 </table>
