@@ -236,12 +236,26 @@ def view_all_people(request):
     myself = get_person_from_user(request.user)
     all_people = Person.objects.exclude(pk=myself.pk).order_by('first_name', 'last_name')
 
+    q = ''
+
+    if 'q' in request.GET:
+        q = request.GET['q']
+        qfn, s, qln = q.rpartition(' ')
+        if qfn:
+            all_people = all_people.filter(
+                Q(first_name__icontains=q) |
+                Q(last_name__icontains=q) |
+                (Q(first_name__icontains=qfn) &
+                 Q(last_name__icontains=qln)) |
+                Q(email__icontains=q))
+        else:
+            all_people = all_people.filter(Q(first_name__icontains=q) | Q(last_name__icontains=q) | Q(email__icontains=q))       
+
     people = []
     for person in all_people:
         people.append((person, myself.recipients.filter(pk=person.pk).count() > 0))
 
-    print 'people: %s' % people
-    return render(request, 'view_all_people.html', { 'myself': myself, 'people': people })
+    return render(request, 'view_all_people.html', { 'myself': myself, 'people': people, 'q': q })
 
 @login_required
 def follow_person(request, person_id):

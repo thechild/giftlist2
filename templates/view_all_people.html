@@ -5,35 +5,52 @@
         <p class="lead">Select the people you want on your gift list, or add new people to the system.</p>
         <p>No one will know if they are on your list or not.</p>
         <hr>
-        <table class="table table-striped">
-            <thead>
-                <th>Name</th>
-                <th>Email</th>
-                <th></th>
-            </thead>
-            <tbody>
-                {% for person, following in people %}
-                <tr>
-                    <td>{{ person.name }}</td>
-                    <td><a href="mailto:{{ person.email }}">{{ person.email }}</a></td>
-                    <td>
-                        {% if following %}<a class="btn btn-inverse btn-small pull-right" href="{% url Gifts.views.unfollow_person person.pk %}">Remove</a>
-                        {% else %}<a class="btn btn-info btn-small pull-right" href="{% url Gifts.views.follow_person person.pk %}">Add</a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan='3'>No one is using this gift list instance yet!  Add someone!</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-<div class='row-fluid'>
-    <div class="span12">
-        <a class="btn btn-success pull-right" href="{% url Gifts.views.add_person %}">Add a New Person</a></p>
+        <div class="row-fluid">
+            <div class="span4 pull-right">
+                <br><br>
+                <form class="form-search well" action="." method="GET">
+                    <div class="row-fluid">
+                        <div class="span12">
+                            <label>Filter by name or email</label>
+                            <div class="input-append">
+                                <input type="text" name="q" class="input-small search-query" value="{{ q }}">
+                                <button type="submit" class="btn">Filter</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="span7 pull-left">    
+                <table class="table table-striped">
+                    <thead>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th></th>
+                    </thead>
+                    <tbody>
+                        {% for person, following in people %}
+                        <tr>
+                            <td>{{ person.name }}</td>
+                            <td><a href="mailto:{{ person.email }}">{{ person.email }}</a></td>
+                            <td>
+                                {% if following %}<a class="btn btn-inverse btn-small pull-right" href="{% url Gifts.views.unfollow_person person.pk %}">Remove</a>
+                                {% else %}<a class="btn btn-info btn-small pull-right" href="{% url Gifts.views.follow_person person.pk %}">Add</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan='3'>No one matched that search.  Add them if they're not already on the site!</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <p class="pull-right">
+                    <a class="btn btn-success pull-right" href="{% url Gifts.views.add_person %}">Add a New Person</a>
+                </p>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
