@@ -1,1 +1,1 @@
-web: gunicorn giftlist.wsgi
+web: newrelic-admin run-program gunicorn giftlist.wsgi
