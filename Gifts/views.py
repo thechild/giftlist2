@@ -135,6 +135,8 @@ def add_secret_gift(request, recipient_id):
             new_gift.secret = True
             new_gift.reserved_by = myself
             new_gift.date_reserved = datetime.now()
+            if new_gift.url:
+                new_gift.url = convert_link(new_gift.url)
             new_gift.save()
             return HttpResponseRedirect(reverse('Gifts.views.view_user', args=(recipient.pk,)))
     else:
