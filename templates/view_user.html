@@ -19,7 +19,7 @@
             <td>{{ gift.title }}{% if gift.secret %} <small class="muted">(Secret)</small>{% endif %}</td>
             <td>{{ gift.description }}</td>
             <td>{{ gift.price }}</td>
-            <td><a href="{{ gift.url }}">{% if gift.url %}View{% endif %}</a></td>
+            <td><a href="{{ gift.url }}" target="_blank">{% if gift.url %}View{% endif %}</a></td>
             <td>
                 {% if gift.pk in reserved_gifts %}
                     <a href="{% url Gifts.views.unreserve_gift user.pk gift.pk %}">

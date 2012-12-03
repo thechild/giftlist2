@@ -15,7 +15,7 @@
                     <td class="span4" {% if g %}rowspan="{{ g.count }}"{% endif %}><a href="{% url Gifts.views.view_user p.pk %}"><b>{{ p.name }}</b></a></td>
                 {% for gft in g %}
                     <td class="span4">
-                        {% if gft.url %}<a href="{{ gft.url }}">{{ gft.title }}</a>
+                        {% if gft.url %}<a href="{{ gft.url }}" target="_blank">{{ gft.title }}</a>
                         {% else %}{{ gft.title }}</td>{% endif %}
                     <td class="span2 no-border">{{ gft.price }}</td>
                 </tr>
