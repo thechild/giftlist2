@@ -213,7 +213,7 @@ def add_person(request):
         form = PersonForm(request.POST)
         if form.is_valid():
             new_person = form.save()
-            new_person.invited_by = myself
+            new_person.invited_by = myself.login_user
             new_person.save()
             myself.recipients.add(new_person)
             # form a relationship eventually, or maybe send an email, etc
