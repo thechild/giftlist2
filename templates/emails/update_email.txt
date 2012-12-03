@@ -1,0 +1,9 @@
+Hey {{ recipient.email }},
+
+I just wanted to let you know that I added some gifts to my list on Gift List.  You can check them out (and reserve one for me!) here:
+
+{{ link }}
+
+Happy Holidays!
+
+{{ sender.first_name }}

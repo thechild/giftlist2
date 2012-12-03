@@ -11,7 +11,7 @@ def send_signup_email(sender, recipient):
         from_email = sender.email
         to_email = [recipient.email, 'thechild+giftexchange@gmail.com']
         
-        plaintext = get_template('new_user_email.txt')
+        plaintext = get_template('emails/new_user_email.txt')
         #htmly = get_template('new_user_email.html')
         
         c = Context({
@@ -32,11 +32,12 @@ def send_update_email(sender, recipient):
         from_email = sender.email
         to_email = [recipient.email, ]
 
-        plaintext = get_template('update_email.txt')
+        plaintext = get_template('emails/update_email.txt')
 
         c = Context({
             'recipient': recipient,
             'sender': sender,
+            'link': reverse('Gifts.views.view_user', recipient.pk)
             })
 
         text_content = plaintext.render(c)
