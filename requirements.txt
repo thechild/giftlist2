@@ -1,4 +1,5 @@
 Django==1.4.2
+amazonify==0.1
 boto==2.6.0
 dj-database-url==0.2.1
 django-forms-bootstrap==2.0.3.post1

@@ -1,7 +1,9 @@
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.template import Context
-from giftlist.settings import SEND_SIGNUP_EMAILS
+from giftlist.settings import SEND_SIGNUP_EMAILS, AMAZON_AFFILIATE_TAG
+from amazonify import amazonify
+from urlparse import urlparse
 
 def send_signup_email(sender, recipient):
     if SEND_SIGNUP_EMAILS:
@@ -30,3 +32,14 @@ def clear_reserved_gifts(sender, recipient):
         g.reserved_by = None
         g.date_reserved = None
     return gifts.count()
+
+def convert_link(link):
+    new_link = None
+
+    if "amazon." in urlparse(link).hostname:
+        new_link = amazonify(link, AMAZON_AFFILIATE_TAG)
+
+    if new_link:
+        return new_link
+    else:
+        return link

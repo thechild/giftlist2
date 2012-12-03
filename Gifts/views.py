@@ -12,7 +12,7 @@ from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.forms import UserCreationForm
 from django.core.mail import EmailMultiAlternatives
-from Gifts.helpers import send_signup_email
+from Gifts.helpers import send_signup_email, convert_link
 
 def home(request):
     return HttpResponseRedirect(reverse('Gifts.views.user_home'))
@@ -98,6 +98,8 @@ def add_gift(request, gift_id=None):
         if form.is_valid():
             new_gift = form.save(commit=False)
             new_gift.recipient = myself
+            if new_gift.url:
+                new_gift.url = convert_link(new_gift.url)
             new_gift.save()
             return HttpResponseRedirect(reverse('Gifts.views.user_home'))
     else:
