@@ -1,13 +1,13 @@
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.template import Context
-from giftlist.settings import SEND_SIGNUP_EMAILS, AMAZON_AFFILIATE_TAG
+from giftlist.settings import SEND_UPDATE_EMAILS, SEND_SIGNUP_EMAILS, AMAZON_AFFILIATE_TAG
 from amazonify import amazonify
 from urlparse import urlparse
 
 def send_signup_email(sender, recipient):
     if SEND_SIGNUP_EMAILS:
-        subject = "Join me on Gift Exchange"
+        subject = "What do you want for the holidays?"
         from_email = sender.email
         to_email = [recipient.email, 'thechild+giftexchange@gmail.com']
         
@@ -24,7 +24,25 @@ def send_signup_email(sender, recipient):
 
         msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
         #msg.attach_alternative(html_content, "text/html")
-        msg.send()
+        msg.send() #maybe run this all in a worker?
+
+def send_update_email(sender, recipient):
+    if SEND_UPDATE_EMAILS:
+        subject = "I've added some gifts on Gift List"
+        from_email = sender.email
+        to_email = [recipient.email, ]
+
+        plaintext = get_template('update_email.txt')
+
+        c = Context({
+            'recipient': recipient,
+            'sender': sender,
+            })
+
+        text_content = plaintext.render(c)
+
+        msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
+        msg.send() #maybe run this all in a worker?
 
 def clear_reserved_gifts(sender, recipient):
     gifts = Gift.objects.filter(recipient=recipient.pk, reserved_by=sender.pk)

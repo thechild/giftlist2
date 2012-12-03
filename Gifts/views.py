@@ -23,7 +23,6 @@ def user_logout(request):
         messages.success(request, "You have been successfully logged out.")
     return HttpResponseRedirect(reverse('django.contrib.auth.views.login'))
 
-
 def new_user_signup(request, user_key):
     if request.user.is_authenticated():
         logout(request) # can't set up a new account while you're already logged in
@@ -236,7 +235,7 @@ def add_person(request):
 def view_all_people(request):
     myself = get_person_from_user(request.user)
     all_people = Person.objects.exclude(pk=myself.pk).order_by('first_name', 'last_name')
-    
+
     people = []
     for person in all_people:
         people.append((person, myself.recipients.filter(pk=person.pk).count() > 0))
