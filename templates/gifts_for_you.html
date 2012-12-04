@@ -6,13 +6,15 @@
         <table class="table ">
             <thead>
                 <th>Person</th>
+                <th>Available Gifts</th>
                 <th>Gift</th>
                 <th>Price</th>
             </thead>
             <tbody>
                 {% for p, g in people_gifts.items %}
                 <tr>
-                    <td class="span4" {% if g %}rowspan="{{ g.count }}"{% endif %}><a href="{% url Gifts.views.view_user p.pk %}"><b>{{ p.name }}</b></a></td>
+                    <td class="span3" {% if g %}rowspan="{{ g.count }}"{% endif %}><a href="{% url Gifts.views.view_user p.pk %}"><b>{{ p.name }}</b></a></td>
+                    <td class="span1" {% if g %}rowspan="{{ g.count }}"{% endif %}>{{ p.available_gifts.count }}</td>
                 {% for gft in g %}
                     <td class="span4">
                         {% if gft.url %}<a href="{{ gft.url }}" target="_blank">{{ gft.title }}</a>
@@ -22,13 +24,14 @@
                 <tr>
                 {% empty %}
                     <td colspan="2" class="span4">
-                        <a class="btn btn-small" href="{% url Gifts.views.view_user p.pk %}">Select a Gift</a>
+                        <a class="btn btn-small" href="{% url Gifts.views.view_user p.pk %}">
+                            {% if p.gifts.count == 0 %}Add a Gift{% else %}Select a Gift{% endif %}</a>
                     </td>
                 </tr>
                 {% endfor %}
                 </tr>
                 {% empty %}
-                <tr><td colspan="3">Build your shopping list by adding people to this list.</td></tr>
+                <tr><td colspan="4">Build your shopping list by adding people to this list.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

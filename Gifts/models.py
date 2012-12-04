@@ -62,6 +62,9 @@ class Person(models.Model):
     def gifts(self):
         return Gift.objects.filter(recipient=self).exclude(secret=True)
 
+    def available_gifts(self):
+        return self.gifts().filter(reserved_by__exact=None)
+
     def name(self):
         if not (self.first_name and self.last_name):
             return self.email
