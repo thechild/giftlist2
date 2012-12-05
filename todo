@@ -1,7 +1,12 @@
 - register a real url?
+
+
 - add an about page
 - let me edit secret gifts
-
+- Emails
+    - send an email to followers when someone adds gifts to their list.  perhaps at most once per day?
+    - let users send an email to people they follow asking them to add gifts to their list.  Say who it's from? (probably)
+    - send an email when someone deletes a gift you've reserved from their list
 
 - pictures of products from links?
 - working on mobile?
@@ -10,6 +15,8 @@
     - What happens if two people add someone with different email addresses?  I guess the search ^ should handle that...
 
 ###COMPLETED###
+- change user_home to show how many gifts a person has selected, and change text to "Add A Gift" versus "Select A Gift" depending on whether or not they've added any gifts
+
 - Enable multiple gifts
     - don't unreserve gifts unless user explicitly does so
     - change user_home and view_user to support multiple reserved gifts
