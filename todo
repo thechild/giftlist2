@@ -1,12 +1,14 @@
 - register a real url?
 
-
 - add an about page
 - let me edit secret gifts
 - Emails
     - send an email to followers when someone adds gifts to their list.  perhaps at most once per day?
     - let users send an email to people they follow asking them to add gifts to their list.  Say who it's from? (probably)
     - send an email when someone deletes a gift you've reserved from their list
+
+- Need to set up an email worker thread, and set up some rules for what to send
+    - Easier to just start with reminder emails that are user activated and
 
 - pictures of products from links?
 - working on mobile?
