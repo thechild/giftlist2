@@ -26,6 +26,24 @@ def send_signup_email(sender, recipient):
         #msg.attach_alternative(html_content, "text/html")
         msg.send() #maybe run this all in a worker?
 
+def send_request_email(sender, recipient):
+    if SEND_REQUEST_EMAILS:
+        subject = "Please add some gifts on Gift List!"
+        from_email = sender.email
+        to_email = [recipient.email, ]
+
+        plaintext = get_template('emails/request_email.txt')
+
+        c = Context({
+            'recipient': recipient,
+            'sender': sender,
+            })
+
+        text_content = plaintext.render(c)
+
+        msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
+        msg.send()
+
 def send_update_email(sender, recipient):
     if SEND_UPDATE_EMAILS:
         subject = "I've added some gifts on Gift List"
