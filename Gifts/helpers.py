@@ -65,6 +65,11 @@ def send_update_email(sender, recipient):
     else:
         print "A message was sent recently from %s to %s so we won't send another." % (sender, recipient)
 
+def send_all_update_emails(sender):
+    recipients = Person.objects.filter(recipients=sender)
+    for recipient in receipients:
+        send_update_email(sender, recipient)
+
 def clear_reserved_gifts(sender, recipient):
     gifts = Gift.objects.filter(recipient=recipient.pk, reserved_by=sender.pk)
     for g in gifts:

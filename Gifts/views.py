@@ -12,7 +12,7 @@ from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.forms import UserCreationForm
 from django.core.mail import EmailMultiAlternatives
-from Gifts.helpers import send_signup_email, convert_link
+from Gifts.helpers import send_signup_email, convert_link, send_all_update_emails
 
 def home(request):
     return HttpResponseRedirect(reverse('Gifts.views.user_home'))
@@ -99,6 +99,8 @@ def add_gift(request, gift_id=None):
             new_gift.recipient = myself
             if new_gift.url:
                 new_gift.url = convert_link(new_gift.url)
+            if not new_gift.pk:
+                send_all_update_emails(myself) # this probably needs to somehow be a worker or it might get slow
             new_gift.save()
             return HttpResponseRedirect(reverse('Gifts.views.user_home'))
     else:
