@@ -6,6 +6,7 @@ from amazonify import amazonify
 from urlparse import urlparse
 from django.core.urlresolvers import reverse
 from Gifts.models import PersonEmail
+import datetime
 import os
 
 ## email helper function ##
@@ -23,6 +24,7 @@ def render_and_send_email(sender, recipient, subject, template, link=''):
     try:
         if os.environ['SEND_EMAILS'] == "True":
             msg.send()
+            print "Email Sent"
     except KeyError:
         print "SEND_MESSAGES is false, so not sending this message:\n"
         print "From: '%s'\tTo: '%s'\tSubject: '%s'" % (from_email, to_email, subject)
@@ -36,6 +38,8 @@ def render_and_send_email(sender, recipient, subject, template, link=''):
     elif template == 'emails/request_gifts.txt':
         stored_email.type_of_email = PersonEmail.REQUEST_EMAIL
     stored_email.save()
+    stored_email.date_sent = stored_email.date_published # this is in case we later want to publish and send at different times
+    stored_email.save()
 
 ## sends a signup email to recipient on behalf of sender ##
 def send_signup_email(sender, recipient):
@@ -45,18 +49,21 @@ def send_signup_email(sender, recipient):
 ## sends an email to recipient requesting he/she add more gifts on behalf of sender ##
 def send_request_email(sender, recipient):
     subject = "Please add some gifts on Gift List!"
-    link = reverse('Gifts.views.user_home', None)
+    
+    link = '%s%s' % (os.environ.get('BASE_IRI'), reverse('Gifts.views.user_home', None))
     render_and_send_email(sender, recipient, subject, 'emails/request_email.txt', link)
 
 ## sends an email to recipient letting him/her know that sender has added new gifts.  Sends a maximum of once a day ##
 def send_update_email(sender, recipient):
     # see if one's already been sent:
-    sent_messages = PersonEmail.objects.filter(sender=sender, recipient=recipient, type_of_email__exact=PersonEmail.GIFT_ADDED_EMAIL).order_by('-sent_date')
-    if sent_messages.count() > 0 and sent_messages[0].sent_date.date() < datetime.date():
+    sent_messages = PersonEmail.objects.filter(sender=sender, recipient=recipient, type_of_email__exact=PersonEmail.GIFT_ADDED_EMAIL).order_by('-date_sent')
+    if sent_messages.count() == 0 or sent_messages[0].date_sent.date() < datetime.date.today():
         # we haven't sent a message today, so let's send one.
         subject = "I've added some gifts on Gift List"
-        link = reverse('Gifts.views.view_user', args=[sender.pk])
+        link = '%s%s' % (os.environ.get('BASE_IRI'), reverse('Gifts.views.view_user', args=[sender.pk]))
         render_and_send_email(sender, recipient, subject, 'emails/update_email.txt', link)
+    else:
+        print "A message was sent recently from %s to %s so we won't send another." % (sender, recipient)
 
 def clear_reserved_gifts(sender, recipient):
     gifts = Gift.objects.filter(recipient=recipient.pk, reserved_by=sender.pk)
