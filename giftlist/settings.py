@@ -25,6 +25,8 @@ DATABASES = {
 
 SEND_SIGNUP_EMAILS = True
 SEND_UPDATE_EMAILS = True
+SEND_REQUEST_EMAILS = True
+SEND_EMAILS = False # if false, will just print that they would have been sent to the log
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name

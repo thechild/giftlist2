@@ -1,6 +1,4 @@
 DEBUG = True
-SEND_SIGNUP_EMAILS = False
-SEND_UPDATE_EMAILS = False
 STATIC_URL = '/static/'
 
 SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
