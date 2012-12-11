@@ -87,3 +87,25 @@ class Gift(models.Model):
 
     def __unicode__(self):
         return '%s (%s)' % (self.title, self.recipient)
+
+class PersonEmail(models.Model)
+    SIGNUP_EMAIL = 'SU'
+    REQUEST_EMAIL = 'RQ'
+    GIFT_ADDED_EMAIL = 'GA'
+    TYPE_OF_EMAIL_CHOICES = (
+        (SIGNUP_EMAIL, 'Invitation'),
+        (REQUEST_EMAIL, 'Gift Request'),
+        (GIFT_ADDED_EMAIL, 'Gift Added Notification'),
+        )
+
+    recipient = models.ForeignKey(Person)
+    sender = models.ForeignKey(Sender)
+    subject = models.CharField(max_length=200)
+    text_body = models.TextField(blank=True)
+    html_body = models.TextField(blank=True)
+    date_published = models.DateTimeField('date published', auto_now_add=True, blank=True)
+    date_sent = models.DateTimeField('date sent', blank=True, null=True)
+    type_of_email = models.CharField(max_length=2, choices=TYPE_OF_EMAIL_CHOICES)
+
+    def __unicode__(self):
+        return "From: '%s' To: '%s' Subj: '%s'" % (self.sender, self.recipient, self.subject)
