@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from uuid import uuid4
 import os
-import helpers
 
 # this should rarely run
 def get_person_from_user(user):
@@ -53,9 +52,6 @@ class Person(models.Model):
     recipients = models.ManyToManyField("self", symmetrical=False)
     invited_by = models.ForeignKey(User, related_name='invitees', blank=True, null=True)
 
-    def send_signup_email(self):
-        helpers.send_signup_email(self.invited_by, self)
-
     def signup_url(self):
         return '%s%s' % (os.environ.get('BASE_IRI'), reverse('Gifts.views.new_user_signup', args=(self.creation_key,)))
 
@@ -88,7 +84,7 @@ class Gift(models.Model):
     def __unicode__(self):
         return '%s (%s)' % (self.title, self.recipient)
 
-class PersonEmail(models.Model)
+class PersonEmail(models.Model):
     SIGNUP_EMAIL = 'SU'
     REQUEST_EMAIL = 'RQ'
     GIFT_ADDED_EMAIL = 'GA'
@@ -98,8 +94,8 @@ class PersonEmail(models.Model)
         (GIFT_ADDED_EMAIL, 'Gift Added Notification'),
         )
 
-    recipient = models.ForeignKey(Person)
-    sender = models.ForeignKey(Sender)
+    recipient = models.ForeignKey(Person, related_name='emails_to')
+    sender = models.ForeignKey(Person, related_name='emails_from')
     subject = models.CharField(max_length=200)
     text_body = models.TextField(blank=True)
     html_body = models.TextField(blank=True)
