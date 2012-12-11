@@ -1,10 +1,12 @@
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.template import Context
-from giftlist.settings import SEND_UPDATE_EMAILS, SEND_SIGNUP_EMAILS, AMAZON_AFFILIATE_TAG
+from giftlist.settings import AMAZON_AFFILIATE_TAG
 from amazonify import amazonify
 from urlparse import urlparse
+from django.core.urlresolvers import reverse
 from Gifts.models import PersonEmail
+import os
 
 ## email helper function ##
 def render_and_send_email(sender, recipient, subject, template, link=''):
@@ -18,10 +20,13 @@ def render_and_send_email(sender, recipient, subject, template, link=''):
         })
     text_content = plaintext.render(c)
     msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
-    if SEND_MESSAGES:
-        msg.send()
-    else:
-        print "SEND_MESSAGES is false, so not sending this message:\n%s" % msg
+    try:
+        if os.environ['SEND_EMAILS'] == "True":
+            msg.send()
+    except KeyError:
+        print "SEND_MESSAGES is false, so not sending this message:\n"
+        print "From: '%s'\tTo: '%s'\tSubject: '%s'" % (from_email, to_email, subject)
+        print "%s" % text_content
 
     stored_email = PersonEmail(sender=sender, recipient=recipient, subject=subject, text_body=text_content)
     if template == 'emails/update_email.txt':
@@ -34,27 +39,24 @@ def render_and_send_email(sender, recipient, subject, template, link=''):
 
 ## sends a signup email to recipient on behalf of sender ##
 def send_signup_email(sender, recipient):
-    if SEND_SIGNUP_EMAILS:
-        subject = "What do you want for the holidays?"
-        render_and_send_email(sender, recipient, subject, 'emails/new_user_email.txt', recipient.signup_url())
+    subject = "What do you want for the holidays?"
+    render_and_send_email(sender, recipient, subject, 'emails/new_user_email.txt', recipient.signup_url())
 
 ## sends an email to recipient requesting he/she add more gifts on behalf of sender ##
 def send_request_email(sender, recipient):
-    if SEND_REQUEST_EMAILS:
-        subject = "Please add some gifts on Gift List!"
-        link = reverse('Gifts.views.user_home')
-        render_and_send_email(sender, recipient, subject, 'emails/request_email.txt', link)
+    subject = "Please add some gifts on Gift List!"
+    link = reverse('Gifts.views.user_home', None)
+    render_and_send_email(sender, recipient, subject, 'emails/request_email.txt', link)
 
 ## sends an email to recipient letting him/her know that sender has added new gifts.  Sends a maximum of once a day ##
 def send_update_email(sender, recipient):
-    if SEND_UPDATE_EMAILS:
-        # see if one's already been sent:
-        sent_messages = PersonEmail.objects.filter(sender=sender, recipient=recipient, type_of_email__exact=PersonEmail.GIFT_ADDED_EMAIL).order_by('-sent_date')
-        if sent_messages.count() > 0 and sent_messages[0].sent_date.date() < datetime.date():
-            # we haven't sent a message today, so let's send one.
-            subject = "I've added some gifts on Gift List"
-            link = reverse('Gifts.views.view_user', args=[sender.pk])
-            render_and_send_email(sender, recipient, subject, 'emails/update_email.txt', link)
+    # see if one's already been sent:
+    sent_messages = PersonEmail.objects.filter(sender=sender, recipient=recipient, type_of_email__exact=PersonEmail.GIFT_ADDED_EMAIL).order_by('-sent_date')
+    if sent_messages.count() > 0 and sent_messages[0].sent_date.date() < datetime.date():
+        # we haven't sent a message today, so let's send one.
+        subject = "I've added some gifts on Gift List"
+        link = reverse('Gifts.views.view_user', args=[sender.pk])
+        render_and_send_email(sender, recipient, subject, 'emails/update_email.txt', link)
 
 def clear_reserved_gifts(sender, recipient):
     gifts = Gift.objects.filter(recipient=recipient.pk, reserved_by=sender.pk)
