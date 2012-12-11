@@ -12,7 +12,7 @@ from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.forms import UserCreationForm
 from django.core.mail import EmailMultiAlternatives
-from Gifts.helpers import send_signup_email, convert_link, send_all_update_emails
+from Gifts.helpers import send_signup_email, convert_link, send_all_update_emails, send_request_email
 
 def home(request):
     return HttpResponseRedirect(reverse('Gifts.views.user_home'))
@@ -206,6 +206,29 @@ def unreserve_gift(request, recipient_id, gift_id):
 
     return HttpResponseRedirect(reverse('Gifts.views.view_user', args=(recipient.pk,)))
 
+@login_required
+def user_gift_request(request, user_id):
+    myself = get_person_from_user(request.user)
+    user = get_object_or_404(Person, pk=user_id)
+    send_request_email(myself, user)
+    messages.success(request, "An email has been sent to %s asking them to add more gifts.  We'll let you know when they do." % user.name())
+    return HttpResponseRedirect(reverse('Gifts.views.view_user', args=(user.pk,)))
+
+@login_required
+def view_user(request, user_id):
+    myself = get_person_from_user(request.user)
+    user = get_object_or_404(Person, pk=user_id)
+    reserved_gifts = [g.pk for g in get_reserved_gifts(myself, user)]
+
+    gifts = Gift.objects.filter(recipient=user).filter(Q(secret=False) | Q(pk__in=reserved_gifts))
+
+    return render(request, 'view_user.html',{
+        'user' : user,
+        'reserved_gifts' : reserved_gifts,
+        'gifts' : gifts,
+        })
+
+
 #####################################
 #### Following and Adding People ####
 #####################################
@@ -267,20 +290,6 @@ def unfollow_person(request, person_id):
     else:
         messages.warning(request, "You weren't following %s." % person.name())
     return HttpResponseRedirect(reverse('Gifts.views.view_all_people'))
-
-@login_required
-def view_user(request, user_id):
-    myself = get_person_from_user(request.user)
-    user = get_object_or_404(Person, pk=user_id)
-    reserved_gifts = [g.pk for g in get_reserved_gifts(myself, user)]
-
-    gifts = Gift.objects.filter(recipient=user).filter(Q(secret=False) | Q(pk__in=reserved_gifts))
-
-    return render(request, 'view_user.html',{
-        'user' : user,
-        'reserved_gifts' : reserved_gifts,
-        'gifts' : gifts,
-        })
 
 @login_required
 def manage_account(request):
