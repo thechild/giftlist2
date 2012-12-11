@@ -36,7 +36,7 @@ def render_and_send_email(sender, recipient, subject, template, link=''):
 def send_signup_email(sender, recipient):
     if SEND_SIGNUP_EMAILS:
         subject = "What do you want for the holidays?"
-        render_and_send_email(sender, recipient, subject, 'emails/new_user_email.txt', recipient.signup_url)
+        render_and_send_email(sender, recipient, subject, 'emails/new_user_email.txt', recipient.signup_url())
 
 ## sends an email to recipient requesting he/she add more gifts on behalf of sender ##
 def send_request_email(sender, recipient):
