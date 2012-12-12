@@ -20,7 +20,11 @@ class MyUserAdmin(UserAdmin):
     list_display = UserAdmin.list_display + ('date_joined',)
 
 class PersonEmailAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('recipient', 'sender', 'subject', 'type_of_email', 'date_sent')
+    date_hierarchy = 'date_sent'
+    list_display_links = ('recipient', 'sender')
+    list_filter = ('recipient', 'sender', 'type_of_email', 'date_sent')
+    ordering = ('-date_sent',)
 
 admin.site.register(PersonEmail, PersonEmailAdmin)
 admin.site.register(Gift, GiftAdmin)
