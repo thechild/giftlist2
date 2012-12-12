@@ -81,7 +81,7 @@ def send_update_email(sender, recipient):
 
 def send_all_update_emails(sender):
     recipients = Person.objects.filter(recipients=sender)
-    for recipient in receipients:
+    for recipient in recipients:
         send_update_email(sender, recipient)
 
 def clear_reserved_gifts(sender, recipient):
