@@ -23,7 +23,9 @@ class PersonEmailAdmin(admin.ModelAdmin):
     list_display = ('recipient', 'sender', 'subject', 'type_of_email', 'date_sent')
     date_hierarchy = 'date_sent'
     list_display_links = ('recipient', 'sender')
-    list_filter = ('recipient', 'sender', 'type_of_email', 'date_sent')
+    list_filter = ('type_of_email', 'date_sent')
+    search_fields = ['recipient__first_name', 'recipient__last_name', 'recipient__email',
+                     'sender__first_name', 'sender__last_name', 'sender__email']
     ordering = ('-date_sent',)
 
 admin.site.register(PersonEmail, PersonEmailAdmin)
