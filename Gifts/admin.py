@@ -1,4 +1,4 @@
-from Gifts.models import Gift, Person
+from Gifts.models import Gift, Person, PersonEmail
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
@@ -19,6 +19,10 @@ class PersonAdmin(admin.ModelAdmin):
 class MyUserAdmin(UserAdmin):
     list_display = UserAdmin.list_display + ('date_joined',)
 
+class PersonEmailAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(PersonEmail, PersonEmailAdmin)
 admin.site.register(Gift, GiftAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.unregister(User)
