@@ -28,11 +28,10 @@ def render_and_send_email(sender, recipient, subject, msg_type, link=''):
         })
     text_content = plaintext.render(c)
     msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
-    try:
-        if os.environ['SEND_EMAILS'] == "True":
-            msg.send()
-            print "Email Sent"
-    except KeyError:
+    if os.environ.get('SEND_EMAILS'):
+        msg.send()
+        print "Email Sent"
+    else:
         print "SEND_MESSAGES is false, so not sending this message:\n"
         print "From: '%s'\tTo: '%s'\tSubject: '%s'" % (from_email, to_email, subject)
         print "%s" % text_content
