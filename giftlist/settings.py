@@ -3,7 +3,7 @@ import socket
 
 # Django settings for giftlist project.
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -167,10 +167,10 @@ LOGGING = {
     }
 }
 
-#import dj_database_url
-#DATABASES['default'] = dj_database_url.config()
+import dj_database_url
+DATABASES['default'] = dj_database_url.config()
 
 try:
-    import giftlist.settings_local
+    from settings_local import *
 except ImportError:
     pass
