@@ -23,9 +23,12 @@
                 </tr>
                 <tr>
                 {% empty %}
-                    <td colspan="2" class="span4">
+                    <td class="span4">
                         <a class="btn btn-small" href="{% url Gifts.views.view_user p.pk %}">
                             {% if p.gifts.count == 0 %}Add a Gift{% else %}Select a Gift{% endif %}</a>
+                    </td>
+                    <td class="span4">
+                        <a class="btn btn-small" href="{% url Gifts.views.user_gift_request p.pk %}">Remind to Add Gifts</a>
                     </td>
                 </tr>
                 {% endfor %}
