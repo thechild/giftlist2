@@ -10,10 +10,17 @@ import datetime
 import os
 
 ## email helper function ##
-def render_and_send_email(sender, recipient, subject, template, link=''):
+def render_and_send_email(sender, recipient, subject, msg_type, link=''):
     from_email = sender.email
     to_email = [recipient.email, ]
-    plaintext = get_template(template)
+    
+    TEMPLATES = {
+        PersonEmail.GIFT_ADDED_EMAIL: 'emails/update_email.txt',
+        PersonEmail.REQUEST_EMAIL: 'emails/request_email.txt',
+        PersonEmail.SIGNUP_EMAIL: 'emails/new_user_email.txt'
+        }
+
+    plaintext = get_template(TEMPLATES[msg_type])
     c = Context({
         'recipient': recipient,
         'sender': sender,
@@ -30,13 +37,11 @@ def render_and_send_email(sender, recipient, subject, template, link=''):
         print "From: '%s'\tTo: '%s'\tSubject: '%s'" % (from_email, to_email, subject)
         print "%s" % text_content
 
-    stored_email = PersonEmail(sender=sender, recipient=recipient, subject=subject, text_body=text_content)
-    if template == 'emails/update_email.txt':
-        stored_email.type_of_email = PersonEmail.GIFT_ADDED_EMAIL
-    elif template == 'emails/new_user_email.txt':
-        stored_email.type_of_email = PersonEmail.SIGNUP_EMAIL
-    elif template == 'emails/request_gifts.txt':
-        stored_email.type_of_email = PersonEmail.REQUEST_EMAIL
+    stored_email = PersonEmail(sender=sender,
+        recipient=recipient,
+        subject=subject,
+        text_body=text_content,
+        type_of_email=msg_type)
     stored_email.save()
     stored_email.date_sent = stored_email.date_published # this is in case we later want to publish and send at different times
     stored_email.save()
@@ -44,14 +49,18 @@ def render_and_send_email(sender, recipient, subject, template, link=''):
 ## sends a signup email to recipient on behalf of sender ##
 def send_signup_email(sender, recipient):
     subject = "What do you want for the holidays?"
-    render_and_send_email(sender, recipient, subject, 'emails/new_user_email.txt', recipient.signup_url())
+    render_and_send_email(sender, recipient, subject, PersonEmail.SIGNUP_EMAIL, recipient.signup_url())
 
 ## sends an email to recipient requesting he/she add more gifts on behalf of sender ##
 def send_request_email(sender, recipient):
     subject = "Please add some gifts on Gift List!"
-    
-    link = '%s%s' % (os.environ.get('BASE_IRI'), reverse('Gifts.views.user_home', None))
-    render_and_send_email(sender, recipient, subject, 'emails/request_email.txt', link)
+    # only let you send one a day - maybe should even make this a longer interval?
+    # also note that this currently fails silently, telling the user an email was sent even if we didn't re-send
+    sent_messages = PersonEmail.objects.filter(sender=sender, recipient=recipient, type_of_email__exact=PersonEmail.REQUEST_EMAIL).order_by('-date_sent')
+    print "sent_messages in send_request_email: %s" % sent_messages
+    if sent_messages.count() == 0 or sent_messages[0].date_sent.date() < datetime.date.today():
+        link = '%s%s' % (os.environ.get('BASE_IRI'), reverse('Gifts.views.user_home', None))
+        render_and_send_email(sender, recipient, subject, PersonEmail.REQUEST_EMAIL, link)
 
 ## sends an email to recipient letting him/her know that sender has added new gifts.  Sends a maximum of once a day ##
 def send_update_email(sender, recipient):
@@ -61,7 +70,7 @@ def send_update_email(sender, recipient):
         # we haven't sent a message today, so let's send one.
         subject = "I've added some gifts on Gift List"
         link = '%s%s' % (os.environ.get('BASE_IRI'), reverse('Gifts.views.view_user', args=[sender.pk]))
-        render_and_send_email(sender, recipient, subject, 'emails/update_email.txt', link)
+        render_and_send_email(sender, recipient, subject, PersonEmail.GIFT_ADDED_EMAIL, link)
     else:
         print "A message was sent recently from %s to %s so we won't send another." % (sender, recipient)
 
