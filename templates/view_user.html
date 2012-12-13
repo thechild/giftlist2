@@ -36,7 +36,7 @@
         {% endfor %}
         <tr>
             <td colspan=4><a class="btn btn-primary btn-small" href="{% url Gifts.views.add_secret_gift user.pk %}">+ Something Else</a><br><br>
-            <a href="{% url Gifts.views.user_gift_request user.pk %}">Ask {{ user.first_name }} to add more</a></td>
+            <a href="{% url Gifts.views.user_gift_request user.pk %}">Ask {{ user.first_name }} to add more gifts</a></td>
         </tr>
     </tbody>
 </table>
