@@ -82,6 +82,7 @@ def send_update_email(sender, recipient):
 def send_all_update_emails(sender):
     recipients = Person.objects.filter(recipients=sender)
     for recipient in recipients:
+        # if recipient.login_user: # only send these emails to people who have actually signed up
         send_update_email(sender, recipient)
 
 def clear_reserved_gifts(sender, recipient):

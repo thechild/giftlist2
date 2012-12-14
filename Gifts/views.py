@@ -14,6 +14,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.mail import EmailMultiAlternatives
 from Gifts.helpers import send_signup_email, convert_link, send_all_update_emails, send_request_email
 
+## / redirects to the user_home view ##
 def home(request):
     return HttpResponseRedirect(reverse('Gifts.views.user_home'))
 
@@ -244,7 +245,7 @@ def add_person(request):
             new_person.invited_by = myself.login_user
             new_person.save()
             myself.recipients.add(new_person)
-            # form a relationship eventually, or maybe send an email, etc
+            new_person.recipients.add(myself) # let's start them off with one person on their list - this may lead to extra emails to them...
             # send an email letting them know how to sign up:
             send_signup_email(myself, new_person)
             return HttpResponseRedirect(reverse('Gifts.views.view_all_people'))
