@@ -13,8 +13,14 @@ def requested_gift_count(obj):
 def reserved_gift_count(obj):
     return Gift.objects.filter(recipient=obj).filter(reserved_by__isnull=False).count()
 
+def has_account(obj):
+    if obj.login_user:
+        return True
+    else:
+        return False
+
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', requested_gift_count, reserved_gift_count)
+    list_display = ('name', requested_gift_count, reserved_gift_count, has_account)
 
 class MyUserAdmin(UserAdmin):
     list_display = UserAdmin.list_display + ('date_joined',)
