@@ -43,7 +43,7 @@ def new_user_signup(request, user_key):
             print "Created new user name '%s'" % (form['username'], )
             person.login_user = user
             person.save()
-            messages.success(request,"Your account is all set up, and you're now logged in as '{{user.username}}'.")
+            messages.success(request,"Your account is all set up, and you're now logged in as '%s'." % user.username)
             return HttpResponseRedirect(reverse('Gifts.views.user_home'))
     else:
         try:
