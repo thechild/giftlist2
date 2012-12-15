@@ -25,8 +25,11 @@
                             <form class="form-search form-inline" action="." method="GET">
                                 <td colspan="2">
                                     <div class="row-fluid">
-                                        <div class="span12 input-append">
+                                        <div class="span12 input-prepend input-append">
+                                            <span class="add-on"><i class="icon-search"></i></span>
                                             <input type="text" name="q" id="appendedInputButton" placeholder="Filter by name or email" class="input-large search-query" value="{{ q }}">
+                                            <span class="add-on">
+                                            <a href="{% url Gifts.views.view_all_people %}" class=""><i class="icon-remove-circle"></i></a>
                                         </div>
                                     </div>
                                 </td>
@@ -35,7 +38,6 @@
                                 </td>
                             </form>
                         </tr>
-
                         {% for person, following in people %}
                         <tr>
                             <td>{{ person.name }}</td>
