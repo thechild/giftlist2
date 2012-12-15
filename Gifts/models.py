@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from uuid import uuid4
 import os
-import helpers
 
 # this should rarely run
 def get_person_from_user(user):
@@ -53,14 +52,14 @@ class Person(models.Model):
     recipients = models.ManyToManyField("self", symmetrical=False)
     invited_by = models.ForeignKey(User, related_name='invitees', blank=True, null=True)
 
-    def send_signup_email(self):
-        helpers.send_signup_email(self.invited_by, self)
-
     def signup_url(self):
         return '%s%s' % (os.environ.get('BASE_IRI'), reverse('Gifts.views.new_user_signup', args=(self.creation_key,)))
 
     def gifts(self):
         return Gift.objects.filter(recipient=self).exclude(secret=True)
+
+    def available_gifts(self):
+        return self.gifts().filter(reserved_by__exact=None)
 
     def name(self):
         if not (self.first_name and self.last_name):
@@ -84,3 +83,25 @@ class Gift(models.Model):
 
     def __unicode__(self):
         return '%s (%s)' % (self.title, self.recipient)
+
+class PersonEmail(models.Model):
+    SIGNUP_EMAIL = 'SU'
+    REQUEST_EMAIL = 'RQ'
+    GIFT_ADDED_EMAIL = 'GA'
+    TYPE_OF_EMAIL_CHOICES = (
+        (SIGNUP_EMAIL, 'Invitation'),
+        (REQUEST_EMAIL, 'Gift Request'),
+        (GIFT_ADDED_EMAIL, 'Gift Added Notification'),
+        )
+
+    recipient = models.ForeignKey(Person, related_name='emails_to')
+    sender = models.ForeignKey(Person, related_name='emails_from')
+    subject = models.CharField(max_length=200)
+    text_body = models.TextField(blank=True)
+    html_body = models.TextField(blank=True)
+    date_published = models.DateTimeField('date published', auto_now_add=True, blank=True)
+    date_sent = models.DateTimeField('date sent', blank=True, null=True)
+    type_of_email = models.CharField(max_length=2, choices=TYPE_OF_EMAIL_CHOICES)
+
+    def __unicode__(self):
+        return "From: '%s' To: '%s' Subj: '%s'" % (self.sender, self.recipient, self.subject)

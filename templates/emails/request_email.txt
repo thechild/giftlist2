@@ -1,0 +1,11 @@
+Hey there {{ recipient.first_name }},
+
+I want to get you a great present for christmas, but I can't really find anything perfect on your list on Gift List.  Would you mind adding some more stuff you want?  Gift List will let me know when you've added some new gifts, so I can go out and pick them up.
+
+It's really easy to do here: {{ link }}
+
+Thanks!
+
+Happy Holidays,
+
+{{ sender.first_name }}

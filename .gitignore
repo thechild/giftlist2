@@ -2,6 +2,5 @@ venv
 *.pyc
 Gifts/migrations
 *.DS_Store
-settings_local.py
-giftlist/settings.py
+giftlist/settings_local.py
 todo

@@ -6,7 +6,7 @@ It lets you make a list of gifts you want, and see all your friends lists too, s
 
 Click the link below to log in and let me know what to get you for the holidays!
 
-{{ recipient.signup_url }}
+{{ link }}
 
 If you have any questions, feel free to reach out to Chris, who built the site, at thechild+giftlist@gmail.com.
 

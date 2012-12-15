@@ -12,8 +12,9 @@ from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.forms import UserCreationForm
 from django.core.mail import EmailMultiAlternatives
-from Gifts.helpers import send_signup_email, convert_link
+from Gifts.helpers import send_signup_email, convert_link, send_all_update_emails, send_request_email
 
+## / redirects to the user_home view ##
 def home(request):
     return HttpResponseRedirect(reverse('Gifts.views.user_home'))
 
@@ -42,7 +43,7 @@ def new_user_signup(request, user_key):
             print "Created new user name '%s'" % (form['username'], )
             person.login_user = user
             person.save()
-            messages.success(request,"Your account is all set up, and you're now logged in.")
+            messages.success(request,"Your account is all set up, and you're now logged in as '%s'." % user.username)
             return HttpResponseRedirect(reverse('Gifts.views.user_home'))
     else:
         try:
@@ -51,7 +52,7 @@ def new_user_signup(request, user_key):
             user = None
 
         if user:
-            messages.error(request, "You've already created your account.  Please login below.")
+            messages.error(request, "You've already created your account.  Please login below.  Your user name is '{{ user.username }}'.")
             return HttpResponseRedirect(reverse('django.contrib.auth.views.login'))
         else:
             form = UserCreateForm()
@@ -99,6 +100,8 @@ def add_gift(request, gift_id=None):
             new_gift.recipient = myself
             if new_gift.url:
                 new_gift.url = convert_link(new_gift.url)
+            if not new_gift.pk:
+                send_all_update_emails(myself) # this probably needs to somehow be a worker or it might get slow
             new_gift.save()
             return HttpResponseRedirect(reverse('Gifts.views.user_home'))
     else:
@@ -204,6 +207,29 @@ def unreserve_gift(request, recipient_id, gift_id):
 
     return HttpResponseRedirect(reverse('Gifts.views.view_user', args=(recipient.pk,)))
 
+@login_required
+def user_gift_request(request, user_id):
+    myself = get_person_from_user(request.user)
+    user = get_object_or_404(Person, pk=user_id)
+    send_request_email(myself, user)
+    messages.success(request, "An email has been sent to %s asking them to add more gifts.  We'll let you know when they do." % user.name())
+    return HttpResponseRedirect(reverse('Gifts.views.view_user', args=(user.pk,)))
+
+@login_required
+def view_user(request, user_id):
+    myself = get_person_from_user(request.user)
+    user = get_object_or_404(Person, pk=user_id)
+    reserved_gifts = [g.pk for g in get_reserved_gifts(myself, user)]
+
+    gifts = Gift.objects.filter(recipient=user).filter(Q(secret=False) | Q(pk__in=reserved_gifts))
+
+    return render(request, 'view_user.html',{
+        'user' : user,
+        'reserved_gifts' : reserved_gifts,
+        'gifts' : gifts,
+        })
+
+
 #####################################
 #### Following and Adding People ####
 #####################################
@@ -219,7 +245,7 @@ def add_person(request):
             new_person.invited_by = myself.login_user
             new_person.save()
             myself.recipients.add(new_person)
-            # form a relationship eventually, or maybe send an email, etc
+            new_person.recipients.add(myself) # let's start them off with one person on their list - this may lead to extra emails to them...
             # send an email letting them know how to sign up:
             send_signup_email(myself, new_person)
             return HttpResponseRedirect(reverse('Gifts.views.view_all_people'))
@@ -279,20 +305,6 @@ def unfollow_person(request, person_id):
     else:
         messages.warning(request, "You weren't following %s." % person.name())
     return HttpResponseRedirect(reverse('Gifts.views.view_all_people'))
-
-@login_required
-def view_user(request, user_id):
-    myself = get_person_from_user(request.user)
-    user = get_object_or_404(Person, pk=user_id)
-    reserved_gifts = [g.pk for g in get_reserved_gifts(myself, user)]
-
-    gifts = Gift.objects.filter(recipient=user).filter(Q(secret=False) | Q(pk__in=reserved_gifts))
-
-    return render(request, 'view_user.html',{
-        'user' : user,
-        'reserved_gifts' : reserved_gifts,
-        'gifts' : gifts,
-        })
 
 @login_required
 def manage_account(request):
