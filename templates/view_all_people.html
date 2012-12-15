@@ -8,17 +8,10 @@
         <div class="row-fluid">
             <div class="span4 pull-right">
                 <br><br>
-                <form class="form-search well" action="." method="GET">
-                    <div class="row-fluid">
-                        <div class="span12">
-                            <label>Filter by name or email</label>
-                            <div class="input-append">
-                                <input type="text" name="q" class="input-small search-query" value="{{ q }}">
-                                <button type="submit" class="btn">Filter</button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+                <div class="well span12">
+                    <p>Select the people you want to give gifts to.  You'll be able to see and reserve any gifts they've added to their own lists.</p><br>
+                    <p>If you can't find someone you want to give gifts to, they may not have joined Gift List yet.  Click Add a New Person to add them to your list, and invite them to join Gift List.</p>
+                </div>
             </div>
             <div class="span7 pull-left">    
                 <table class="table table-striped">
@@ -28,6 +21,21 @@
                         <th></th>
                     </thead>
                     <tbody>
+                        <tr class="well">
+                            <form class="form-search form-inline" action="." method="GET">
+                                <td colspan="2">
+                                    <div class="row-fluid">
+                                        <div class="span12 input-append">
+                                            <input type="text" name="q" id="appendedInputButton" placeholder="Filter by name or email" class="input-large search-query" value="{{ q }}">
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button type="submit" class="btn btn-info pull-right">Filter</button>
+                                </td>
+                            </form>
+                        </tr>
+
                         {% for person, following in people %}
                         <tr>
                             <td>{{ person.name }}</td>
