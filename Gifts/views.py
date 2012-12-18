@@ -58,8 +58,7 @@ def new_user_signup(request, user_key):
             form = UserCreateForm()
             form.initial = {'first_name': person.first_name, 'last_name': person.last_name, 'email': person.email}
         
-        return render(request, 'new_user.html',
-                {'form': form})
+    return render(request, 'new_user.html', {'form': form})
 
 @login_required
 def user_home(request):
