@@ -19,4 +19,6 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^home/', include('Gifts.urls')),
     url(r'^account/', include('password_reset.urls')),
+    url(r'^password/', 'django.contrib.auth.views.password_change', { 'template_name': 'templates/registration/password_change.html' }),
+    url(r'^password/done/', 'django.contrib.auth.views.password_change_done', { 'template_name': 'templates/registration/password_change_done.html' }),
 )

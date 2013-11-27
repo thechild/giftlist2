@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>2012 Gift Exchange</title>
+    <title>2013 Gift Exchange</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -47,7 +47,7 @@
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li class="{% ifequal request.path 'home/' %}active{% endifequal %}"><a href="/home/">Home</a></li>
-              <li><a href="{% url 'Gifts.views.manage_account' %}">Account</a></li>
+              <li><a href="{% url 'django.contrib.auth.views.password_change' %}">Account</a></li>
               <li><a href="{% url 'Gifts.views.user_logout' %}">Logout</a></li>
             </ul>
           </div>

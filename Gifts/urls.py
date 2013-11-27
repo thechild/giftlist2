@@ -15,5 +15,4 @@ urlpatterns = patterns('Gifts.views',
     url(r'^user/(\d+)/follow/$', 'follow_person', name='follow_person'),
     url(r'^user/(\d+)/unfollow/$', 'unfollow_person', name='unfollow_person'),
 
-    url(r'^account/$', 'manage_account', name='manage_account'),
 )
