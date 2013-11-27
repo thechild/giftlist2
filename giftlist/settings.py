@@ -3,7 +3,10 @@ import socket
 
 # Django settings for giftlist project.
 
-DEBUG = False
+DEBUG = True
+if os.environ.has_key('DEBUG_APP'):
+    DEBUG = os.environ['DEBUG_APP']
+
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -170,8 +173,3 @@ LOGGING = {
 
 import dj_database_url
 DATABASES['default'] = dj_database_url.config()
-
-try:
-    from settings_local import *
-except ImportError:
-    pass
