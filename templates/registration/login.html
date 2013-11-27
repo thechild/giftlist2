@@ -4,9 +4,8 @@
 <p class="lead">Please log in to access the gift exchange.  If you don't have an account, ask someone with an account to add you to their gift list.</p>
 <hr>
 {% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
+<p>Your username and password didn't match. Please try again, or <a href="{% url 'password_reset_recover' %}">reset your password</a>.</p>
 {% endif %}
-<form method="post" action="{% url django.contrib.auth.views.login %}">
 <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
 <div class="row-fluid">
     <div class="span8 offset2">
@@ -19,7 +18,7 @@
             </div>
             <div class="span5 pull-right">
                 <img class="hidden-phone" src="{{STATIC_URL}}img/gift.png">
-                
+
             </div>
         </div>
     </div>

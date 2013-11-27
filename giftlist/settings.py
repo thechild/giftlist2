@@ -134,6 +134,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'password_reset',
     'Gifts',
     'django.contrib.admin',
     #'django.contrib.admindocs',
