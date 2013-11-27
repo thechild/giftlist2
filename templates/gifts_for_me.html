@@ -19,7 +19,7 @@
                     <td class="span4">{{gift.description}}</td>
                     <td class="span3">{{gift.price}}</td>
                     <td class="span1">
-                        <a class="btn btn-small" href="{% url Gifts.views.add_gift gift.pk %}">Edit</a>
+                        <a class="btn btn-small" href="{% url 'Gifts.views.add_gift' gift.pk %}">Edit</a>
                         {% comment %}
                         <div class="btn-group pull-right">
                             <a class="btn dropdown-toggle btn-small" data-toggle="dropdown" href="#">
@@ -27,8 +27,8 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a tabindex="-1" href="{% url Gifts.views.add_gift gift.pk %}">Edit</a></li>
-                                <li><a href="{% url Gifts.views.remove_gift gift.pk %}">Remove</a></li>
+                                <li><a tabindex="-1" href="{% url 'Gifts.views.add_gift' gift.pk %}">Edit</a></li>
+                                <li><a href="{% url 'Gifts.views.remove_gift' gift.pk %}">Remove</a></li>
                             </ul>
                         </div>
                         {% endcomment %}
@@ -47,6 +47,6 @@
 </div>
 <div class="row-fluid">
     <div class="span12">
-        <a class="btn btn-primary pull-right" href="{% url Gifts.views.add_gift %}">Add a Gift you want</a>
+        <a class="btn btn-primary pull-right" href="{% url 'Gifts.views.add_gift' %}">Add a Gift you want</a>
     </div>
 </div>

@@ -1,0 +1,15 @@
+Happy Holidays {{ recipient.first_name }},
+
+I'm using Gift Exchange, a simple web app for keeping track of gifts I'm getting people this holiday season, and I'd love for you to join me.
+
+It lets you make a list of gifts you want, and see all your friends lists too, so that everyone gets what they want!
+
+Click the link below to log in and let me know what to get you for the holidays!
+
+{{ recipient.signup_url }}
+
+If you have any questions, feel free to reach out to Chris, who built the site, at thechild+giftlist@gmail.com.
+
+Happy Holidays,
+
+{{ sender.first_name }}

@@ -43,12 +43,12 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="{% url Gifts.views.user_home %}">Gift Exchange</a>
+          <a class="brand" href="{% url 'Gifts.views.user_home' %}">Gift Exchange</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li class="{% ifequal request.path 'home/' %}active{% endifequal %}"><a href="/home/">Home</a></li>
-              <li><a href="{% url Gifts.views.manage_account %}">Account</a></li>
-              <li><a href="{% url Gifts.views.user_logout %}">Logout</a></li>
+              <li><a href="{% url 'Gifts.views.manage_account' %}">Account</a></li>
+              <li><a href="{% url 'Gifts.views.user_logout' %}">Logout</a></li>
             </ul>
           </div>
         </div>

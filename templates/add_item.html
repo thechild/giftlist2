@@ -17,9 +17,9 @@
         <div class="span5 well">
                 <p>{{ add_description }}</p>
                 <br>
-                {% if giftid %}<a class="btn btn-danger btn-block" href="{% url Gifts.views.remove_gift giftid %}">Delete Gift</a>{% endif %}
+                {% if giftid %}<a class="btn btn-danger btn-block" href="{% url 'Gifts.views.remove_gift' giftid %}">Delete Gift</a>{% endif %}
                 <br>
-                <a href="{% url Gifts.views.user_home %}" class="btn btn-block">Cancel</a>
+                <a href="{% url 'Gifts.views.user_home' %}" class="btn btn-block">Cancel</a>
                 <input type='submit' value='{{ submit_text|default:"Add" }}' class='btn btn-primary btn-block'>
         </div>
     </form>
