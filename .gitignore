@@ -4,3 +4,5 @@ Gifts/migrations
 *.DS_Store
 giftlist/settings_local.py
 todo
+
+*.old
