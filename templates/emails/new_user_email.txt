@@ -8,8 +8,6 @@ Click the link below to log in and let me know what to get you for the holidays!
 
 {{ link }}
 
-If you have any questions, feel free to reach out to Chris, who built the site, at thechild+giftlist@gmail.com.
-
 Happy Holidays,
 
 {{ sender.first_name }}
