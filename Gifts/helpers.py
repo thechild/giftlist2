@@ -11,9 +11,9 @@ import os
 
 ## email helper function ##
 def render_and_send_email(sender, recipient, subject, msg_type, link=''):
-    from_email = sender.email
+    from_email = "%s %s (via Gift Exchange) <%s>" % (sender.first_name, sender.last_name, sender.email)
     to_email = [recipient.email, ]
-    
+
     TEMPLATES = {
         PersonEmail.GIFT_ADDED_EMAIL: 'emails/update_email.txt',
         PersonEmail.REQUEST_EMAIL: 'emails/request_email.txt',
@@ -56,7 +56,7 @@ def send_signup_email(sender, recipient):
 def send_request_email(sender, recipient):
     subject = "Please add some gifts on Gift List!"
     # check to see if they've registered
-    if recipient.login_user:        
+    if recipient.login_user:
         # only let you send one a day - maybe should even make this a longer interval?
         # also note that this currently fails silently, telling the user an email was sent even if we didn't re-send
         sent_messages = PersonEmail.objects.filter(sender=sender, recipient=recipient, type_of_email__exact=PersonEmail.REQUEST_EMAIL).order_by('-date_sent')
