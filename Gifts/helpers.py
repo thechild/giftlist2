@@ -11,6 +11,7 @@ import os
 
 ## email helper function ##
 def render_and_send_email(sender, recipient, subject, msg_type, link=''):
+
     from_email = "%s %s (via Gift Exchange) <%s>" % (sender.first_name, sender.last_name, sender.email)
     to_email = [recipient.email, ]
 
