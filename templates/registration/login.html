@@ -14,7 +14,8 @@
                 {% csrf_token %}
                 {{ form|as_bootstrap }}
                 <input type="hidden" name="next" value="{{ next }}" >
-                <input type="submit" value="Login" class="btn btn-primary">
+                <input type="submit" value="Login" class="btn btn-primary"><br><br>
+                <a href="{% url 'password_reset_recover' %}">Forgot Password?</a>
             </div>
             <div class="span5 pull-right">
                 <img class="hidden-phone" src="{{STATIC_URL}}img/gift.png">
