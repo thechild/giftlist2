@@ -13,6 +13,8 @@ ADMINS = (
      ('Chris Child', 'thechild@gmail.com'),
 )
 
+DEFAULT_FROM_EMAIL = 'thechild@gmail.com'
+
 MANAGERS = ADMINS
 
 DATABASES = {
@@ -170,6 +172,8 @@ LOGGING = {
         },
     }
 }
+
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 import dj_database_url
 DATABASES['default'] = dj_database_url.config()
