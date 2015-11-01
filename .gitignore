@@ -6,3 +6,5 @@ giftlist/settings_local.py
 todo
 
 *.old
+
+.env
