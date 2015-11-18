@@ -10,6 +10,7 @@ from datetime import datetime
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from Gifts.helpers import send_signup_email, convert_link, send_all_update_emails, send_request_email
+import analytics
 
 
 # / redirects to the user_home view #
