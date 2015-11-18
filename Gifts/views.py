@@ -78,6 +78,10 @@ def user_home(request):
         else:
             people_gifts[p] = None
 
+    analytics.page(request.user.id, 'giftlist', 'user_home', {
+        'url': request.url
+        })
+
     return render(request, "user_home.html", {
         'person' : myself,
         'gifts' : gifts,
@@ -104,8 +108,21 @@ def add_gift(request, gift_id=None):
             if new_gift.url:
                 new_gift.url = convert_link(new_gift.url)
             if not new_gift.pk:
-                send_all_update_emails(myself) # this probably needs to somehow be a worker or it might get slow
-            new_gift.save()
+                send_all_update_emails(myself)  # this probably needs to somehow be a worker or it might get slow
+
+                analytics.track(request.user.id, 'Added/Edited a Gift', {
+                    'title': new_gift.title,
+                    'url': new_gift.url
+                    })
+
+                new_gift.save()
+            else:
+                analytics.track(request.user.id, 'Edited a Gift', {
+                    'gift_id': new_gift.pk,
+                    'title': new_gift.title,
+                    'url': new_gift.url
+                    })
+
             return HttpResponseRedirect(reverse('Gifts.views.user_home'))
     else:
         form = GiftForm(instance=gift)
