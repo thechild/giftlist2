@@ -1,33 +1,34 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from Gifts.models import *
 from Gifts.forms import *
-from django.template import RequestContext
 from datetime import datetime
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.forms import UserCreationForm
-from django.core.mail import EmailMultiAlternatives
 from Gifts.helpers import send_signup_email, convert_link, send_all_update_emails, send_request_email
 
-## / redirects to the user_home view ##
+
+# / redirects to the user_home view #
 def home(request):
     return HttpResponseRedirect(reverse('Gifts.views.user_home'))
+
 
 def user_logout(request):
     if request.user.is_authenticated():
         logout(request)
+
         messages.success(request, "You have been successfully logged out.")
     return HttpResponseRedirect(reverse('django.contrib.auth.views.login'))
 
+
 def new_user_signup(request, user_key):
     if request.user.is_authenticated():
-        logout(request) # can't set up a new account while you're already logged in
-    if user_key=='test':
+        logout(request)  # can't set up a new account while you're already logged in
+    if user_key == 'test':
         person = Person()
     else:
         person = get_object_or_404(Person, creation_key__exact=user_key)
@@ -60,6 +61,7 @@ def new_user_signup(request, user_key):
         
     return render(request, 'new_user.html', {'form': form})
 
+
 @login_required
 def user_home(request):
     myself = get_person_from_user(request.user)
@@ -80,6 +82,7 @@ def user_home(request):
         'gifts' : gifts,
         'people_gifts' : people_gifts,
         })
+
 
 @login_required
 def add_gift(request, gift_id=None):
@@ -122,6 +125,7 @@ def add_gift(request, gift_id=None):
         'submit_text': submit_text,
         'giftid': gift_id })
 
+
 @login_required
 def add_secret_gift(request, recipient_id):
     myself = get_person_from_user(request.user)
@@ -148,6 +152,7 @@ def add_secret_gift(request, recipient_id):
         'add_title': 'Add a new gift for %s' % recipient.name(),
         'add_description': 'Enter the details of the gift you would like to get for %s.  No one besides you will ever see this information.' % recipient.name()})
 
+
 @login_required
 def remove_gift(request, gift_id):
     myself = get_person_from_user(request.user)
@@ -168,6 +173,7 @@ def remove_gift(request, gift_id):
 
     return HttpResponseRedirect(reverse('Gifts.views.user_home'))
 
+
 @login_required
 def reserve_gift(request, recipient_id, gift_id):
     myself = get_person_from_user(request.user)
@@ -186,6 +192,7 @@ def reserve_gift(request, recipient_id, gift_id):
         messages.error(request, 'Someone has already reserved that gift!')
 
     return HttpResponseRedirect(reverse('Gifts.views.view_user', args=(recipient.pk,)))
+
 
 @login_required
 def unreserve_gift(request, recipient_id, gift_id):
@@ -206,6 +213,7 @@ def unreserve_gift(request, recipient_id, gift_id):
 
     return HttpResponseRedirect(reverse('Gifts.views.view_user', args=(recipient.pk,)))
 
+
 @login_required
 def user_gift_request(request, user_id):
     myself = get_person_from_user(request.user)
@@ -213,6 +221,7 @@ def user_gift_request(request, user_id):
     send_request_email(myself, user)
     messages.success(request, "An email has been sent to %s asking them to add more gifts.  We'll let you know when they do." % user.name())
     return HttpResponseRedirect(reverse('Gifts.views.view_user', args=(user.pk,)))
+
 
 @login_required
 def view_user(request, user_id):
@@ -256,6 +265,7 @@ def add_person(request):
         'add_title': 'Add a new person you would like to give a gift to.',
         'add_description': "By adding a new person, you can track what gift you'd like to give them.  This will also send them an email inviting them to join Gift Exchange so that you can see the gifts they want."})
 
+
 @login_required
 def view_all_people(request):
     myself = get_person_from_user(request.user)
@@ -282,6 +292,7 @@ def view_all_people(request):
 
     return render(request, 'view_all_people.html', { 'myself': myself, 'people': people, 'q': q })
 
+
 @login_required
 def follow_person(request, person_id):
     myself = get_person_from_user(request.user)
@@ -292,6 +303,7 @@ def follow_person(request, person_id):
         myself.recipients.add(person)
         messages.success(request, "%s is now on your gift list! Pick them out something nice!" % person.name())
     return HttpResponseRedirect(reverse('Gifts.views.view_all_people'))
+
 
 @login_required
 def unfollow_person(request, person_id):
@@ -304,6 +316,7 @@ def unfollow_person(request, person_id):
     else:
         messages.warning(request, "You weren't following %s." % person.name())
     return HttpResponseRedirect(reverse('Gifts.views.view_all_people'))
+
 
 @login_required
 def manage_account(request):
