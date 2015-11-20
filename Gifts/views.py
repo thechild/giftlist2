@@ -79,9 +79,7 @@ def user_home(request):
         else:
             people_gifts[p] = None
 
-    analytics.page(request.user.id, 'giftlist', 'user_home', {
-        'url': request.url
-        })
+    analytics.page(request.user.id, 'giftlist', 'user_home')
 
     return render(request, "user_home.html", {
         'person' : myself,
@@ -128,7 +126,7 @@ def add_gift(request, gift_id=None):
 
             return HttpResponseRedirect(reverse('Gifts.views.user_home'))
     else:
-        analytics.page(request.user.id, 'add_gift')
+        analytics.page(request.user.id, 'giftlist', 'add_gift')
         form = GiftForm(instance=gift)
 
     if gift_id:
@@ -180,7 +178,7 @@ def add_secret_gift(request, recipient_id):
             new_gift.save()
             return HttpResponseRedirect(reverse('Gifts.views.view_user', args=(recipient.pk,)))
     else:
-        analytics.page(request.user.id, 'add_secret_gift')
+        analytics.page(request.user.id, 'giftlist', 'add_secret_gift')
         form = GiftForm()
 
     return render(request, 'add_item.html',
@@ -291,9 +289,9 @@ def view_user(request, user_id):
     reserved_gifts = [g.pk for g in get_reserved_gifts(myself, user)]
 
     gifts = Gift.objects.filter(recipient=user).filter(Q(secret=False) | Q(pk__in=reserved_gifts))
-    unreserved_gift_count = gifts.exclude(reserved_by__isnull=True).exclude(reserved_by="").count()
+    unreserved_gift_count = gifts.exclude(reserved_by__isnull=True).count()
 
-    analytics.page(request.user.id, 'View User', {
+    analytics.page(request.user.id, 'giftlist', 'view_user', {
         'recipient_id': user.id,
         'recipient_name': user.name(),
         'reserved_gifts': len(reserved_gifts),
@@ -332,7 +330,7 @@ def add_person(request):
     else:
         form = PersonForm()
 
-    analytics.page(request.user.id, 'add_person')
+    analytics.page(request.user.id, 'giftlist', 'add_person')
     return render(request,'add_item.html',
         {'form': form,
         'add_title': 'Add a new person you would like to give a gift to.',
@@ -365,7 +363,7 @@ def view_all_people(request):
     for person in all_people:
         people.append((person, myself.recipients.filter(pk=person.pk).count() > 0))
 
-    analytics.page(request.user.id, 'View People', {
+    analytics.page(request.user.id, 'giftlist', 'view_people', {
         'count': len(people),
         'filtered': 'Yes' if 'q' in request.GET else 'No'
         })
@@ -409,6 +407,6 @@ def unfollow_person(request, person_id):
 @login_required
 def manage_account(request):
     myself = get_person_from_user(request.user)
-    analytics.page(request.user.id, 'manage_account')
+    analytics.page(request.user.id, 'giftlist', 'manage_account')
     messages.warning(request, "Sorry, this isn't implemented yet.")
     return HttpResponseRedirect(reverse('Gifts.views.user_home'))
