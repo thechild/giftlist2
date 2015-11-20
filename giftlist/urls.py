@@ -1,7 +1,14 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
+
 admin.autodiscover()
+
+import os
+import logging
+import analytics # segment.io
+analytics.debug = False
+analytics.write_key = os.environ['SEGMENT_WRITE_KEY']
 
 urlpatterns = patterns('',
     # Examples:

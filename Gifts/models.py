@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from uuid import uuid4
 import os
+import signals
 
 # this should rarely run
 def get_person_from_user(user):
