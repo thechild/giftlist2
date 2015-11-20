@@ -1,7 +1,8 @@
 import analytics
 from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.contrib.auth.signals import user_login_failed
 from django.dispatch import receiver
-import logging
+import uuid
 
 
 # auth completed signal #
@@ -22,3 +23,9 @@ def logout_log(sender, **kwargs):
     if 'user' in kwargs:
         user = kwargs['user']
         analytics.track(user.id, 'Logged Out')
+
+
+@receiver(user_login_failed)
+def failed_login_log(sender, **kwargs):
+    uid = str(uuid.uuid4())  # we don't have access to the request...
+    analytics.track(uid, 'Login Failed', kwargs['credentials'])
