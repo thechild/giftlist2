@@ -45,7 +45,8 @@ def new_user_signup(request, user_key):
             print "Created new user name '%s'" % (form['username'], )
             person.login_user = user
             person.save()
-            messages.success(request,"Your account is all set up, and you're now logged in as '%s'." % user.username)
+            analytics.track(user.id, 'Signup')
+            messages.success(request, "Your account is all set up, and you're now logged in as '%s'." % user.username)
             return HttpResponseRedirect(reverse('Gifts.views.user_home'))
     else:
         try:
@@ -110,9 +111,10 @@ def add_gift(request, gift_id=None):
             if not new_gift.pk:
                 send_all_update_emails(myself)  # this probably needs to somehow be a worker or it might get slow
 
-                analytics.track(request.user.id, 'Added/Edited a Gift', {
+                analytics.track(request.user.id, 'Added a Gift', {
                     'title': new_gift.title,
-                    'url': new_gift.url
+                    'url': new_gift.url,
+                    'type': 'self'
                     })
 
                 new_gift.save()
@@ -120,11 +122,13 @@ def add_gift(request, gift_id=None):
                 analytics.track(request.user.id, 'Edited a Gift', {
                     'gift_id': new_gift.pk,
                     'title': new_gift.title,
-                    'url': new_gift.url
+                    'url': new_gift.url,
+                    'type': 'self'
                     })
 
             return HttpResponseRedirect(reverse('Gifts.views.user_home'))
     else:
+        analytics.page(request.user.id, 'add_gift')
         form = GiftForm(instance=gift)
 
     if gift_id:
@@ -160,9 +164,23 @@ def add_secret_gift(request, recipient_id):
             new_gift.date_reserved = datetime.now()
             if new_gift.url:
                 new_gift.url = convert_link(new_gift.url)
+            if not new_gift.pk:
+                analytics.track(request.user.id, 'Added a Gift', {
+                    'title': new_gift.title,
+                    'url': new_gift.url,
+                    'type': 'secret'
+                    })
+            else:
+                analytics.track(request.user.id, 'Edited a Gift', {
+                    'gift_id': new_gift.pk,
+                    'title': new_gift.title,
+                    'url': new_gift.url,
+                    'type': 'secret'
+                    })
             new_gift.save()
             return HttpResponseRedirect(reverse('Gifts.views.view_user', args=(recipient.pk,)))
     else:
+        analytics.page(request.user.id, 'add_secret_gift')
         form = GiftForm()
 
     return render(request, 'add_item.html',
@@ -180,6 +198,11 @@ def remove_gift(request, gift_id):
         if request.method == 'POST':
             # this is the confirmation
             title = gift.title
+            analytics.track(request.user.id, 'Deleted a Gift', {
+                'gift_id': gift.id,
+                'title': gift.title,
+                'url': gift.url
+                })
             gift.delete()
             messages.info(request, "The %s was removed from your gift list." % title)
         else:
@@ -198,6 +221,8 @@ def reserve_gift(request, recipient_id, gift_id):
     recipient = get_object_or_404(Person, pk=recipient_id)
     gift = get_object_or_404(Gift, pk=gift_id)
 
+    success = false
+
     if gift.reserved_by is None:
         # unreserve any other gifts first
         # clear_reserved_gifts(myself, recipient)
@@ -206,8 +231,16 @@ def reserve_gift(request, recipient_id, gift_id):
         gift.date_reserved = datetime.now()
         gift.save()
         messages.success(request, "You've successfully reserved the %s for %s!" % (gift.title, recipient.first_name))
+        success = true
     else:
         messages.error(request, 'Someone has already reserved that gift!')
+
+    analytics.track(request.user.id, 'Reserved a Gift', {
+        'gift_title': gift.title,
+        'recipient_id': recipient.id,
+        'recipient_name': recipient.name(),
+        'success': 'Yes' if success else 'No'
+        })
 
     return HttpResponseRedirect(reverse('Gifts.views.view_user', args=(recipient.pk,)))
 
@@ -226,6 +259,12 @@ def unreserve_gift(request, recipient_id, gift_id):
         else:
             gift.save()
         messages.success(request, "You are no longer reserving the %s for %s." % (gift.title, recipient.first_name))
+
+        analytics.track(request.user.id, 'Unreserved a Gift', {
+            'gift_title': gift.title,
+            'recipient_id': recipient.id,
+            'recipient_name': recipient.name()
+            })
     else:
         messages.error(request, "You don't have permission to access that gift!")
 
@@ -238,6 +277,10 @@ def user_gift_request(request, user_id):
     user = get_object_or_404(Person, pk=user_id)
     send_request_email(myself, user)
     messages.success(request, "An email has been sent to %s asking them to add more gifts.  We'll let you know when they do." % user.name())
+    analytics.track(request.user.id, 'Requested more Gifts', {
+        'recipient_id': user.id,
+        'recipient_name': user.name()
+        })
     return HttpResponseRedirect(reverse('Gifts.views.view_user', args=(user.pk,)))
 
 
@@ -248,11 +291,19 @@ def view_user(request, user_id):
     reserved_gifts = [g.pk for g in get_reserved_gifts(myself, user)]
 
     gifts = Gift.objects.filter(recipient=user).filter(Q(secret=False) | Q(pk__in=reserved_gifts))
+    unreserved_gift_count = gifts.exclude(reserved_by__isnull=True).exclude(reserved_by="").count()
 
-    return render(request, 'view_user.html',{
-        'user' : user,
-        'reserved_gifts' : reserved_gifts,
-        'gifts' : gifts,
+    analytics.page(request.user.id, 'View User', {
+        'recipient_id': user.id,
+        'recipient_name': user.name(),
+        'reserved_gifts': len(reserved_gifts),
+        'available_gifts': unreserved_gift_count
+        })
+
+    return render(request, 'view_user.html', {
+        'user': user,
+        'reserved_gifts': reserved_gifts,
+        'gifts': gifts,
         })
 
 
@@ -271,13 +322,17 @@ def add_person(request):
             new_person.invited_by = myself.login_user
             new_person.save()
             myself.recipients.add(new_person)
-            new_person.recipients.add(myself) # let's start them off with one person on their list - this may lead to extra emails to them...
+            new_person.recipients.add(myself)  # let's start them off with one person on their list - this may lead to extra emails to them...
             # send an email letting them know how to sign up:
             send_signup_email(myself, new_person)
+            analytics.track(request.user.id, 'Invited a new Person', {
+                'person_id': new_person.id
+                })
             return HttpResponseRedirect(reverse('Gifts.views.view_all_people'))
     else:
         form = PersonForm()
 
+    analytics.page(request.user.id, 'add_person')
     return render(request,'add_item.html',
         {'form': form,
         'add_title': 'Add a new person you would like to give a gift to.',
@@ -302,13 +357,20 @@ def view_all_people(request):
                  Q(last_name__icontains=qln)) |
                 Q(email__icontains=q))
         else:
-            all_people = all_people.filter(Q(first_name__icontains=q) | Q(last_name__icontains=q) | Q(email__icontains=q))       
+            all_people = all_people.filter(Q(first_name__icontains=q)
+                                           | Q(last_name__icontains=q)
+                                           | Q(email__icontains=q))
 
     people = []
     for person in all_people:
         people.append((person, myself.recipients.filter(pk=person.pk).count() > 0))
 
-    return render(request, 'view_all_people.html', { 'myself': myself, 'people': people, 'q': q })
+    analytics.page(request.user.id, 'View People', {
+        'count': len(people),
+        'filtered': 'Yes' if 'q' in request.GET else 'No'
+        })
+
+    return render(request, 'view_all_people.html', {'myself': myself, 'people': people, 'q': q})
 
 
 @login_required
@@ -320,6 +382,10 @@ def follow_person(request, person_id):
     else:
         myself.recipients.add(person)
         messages.success(request, "%s is now on your gift list! Pick them out something nice!" % person.name())
+        analytics.track(request.user.id, 'Followed a Person', {
+            'recipient_id': person.id,
+            'total_recipients': myself.recipients.count()
+            })
     return HttpResponseRedirect(reverse('Gifts.views.view_all_people'))
 
 
@@ -330,7 +396,11 @@ def unfollow_person(request, person_id):
     if myself.recipients.filter(pk=person.pk).count() > 0:
         myself.recipients.remove(person)
         cleared_gifts = clear_reserved_gifts(myself, person)
-        messages.success(request, "Removed %s from your list, and unreserved any gifts you had reserved for them." % person.name())
+        messages.success(request, "Removed %s from your list, and unreserved %s gifts you had reserved for them." % (person.name(), len(cleared_gifts)))
+        analytics.track(request.user.id, 'Unfollowed a Person', {
+            'recipient_id': person.id,
+            'total_recipients': myself.recipients.count()
+            })
     else:
         messages.warning(request, "You weren't following %s." % person.name())
     return HttpResponseRedirect(reverse('Gifts.views.view_all_people'))
@@ -339,5 +409,6 @@ def unfollow_person(request, person_id):
 @login_required
 def manage_account(request):
     myself = get_person_from_user(request.user)
+    analytics.page(request.user.id, 'manage_account')
     messages.warning(request, "Sorry, this isn't implemented yet.")
     return HttpResponseRedirect(reverse('Gifts.views.user_home'))
