@@ -7,7 +7,7 @@ admin.autodiscover()
 import os
 import logging
 import analytics # segment.io
-analytics.debug = True
+analytics.debug = False
 analytics.write_key = os.environ['SEGMENT_WRITE_KEY']
 
 urlpatterns = patterns('',
