@@ -16,6 +16,7 @@ def login_log(sender, **kwargs):
         'lastName': user.last_name,
         'username': user.get_username()
     })
+    analytics.track(user.id, 'Logged In')
 
 
 @receiver(user_logged_out)
