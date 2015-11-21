@@ -10,10 +10,12 @@ class PersonForm(forms.ModelForm):
         model = Person
         fields = ('first_name', 'last_name', 'email')
 
+
 class GiftForm(forms.ModelForm):
     class Meta:
         model = Gift
         fields = ('title', 'description', 'url', 'price')
+
 
 class UserForm(forms.ModelForm):
     class Meta:
@@ -23,9 +25,10 @@ class UserForm(forms.ModelForm):
             'password': PasswordInput()
         }
 
+
 class UserCreateForm(UserCreationForm):
     email = forms.EmailField(required=True)
 
     class Meta:
         model = User
-        fields = ( "first_name", "last_name", "username", "email" )
+        fields = ("first_name", "last_name", "username", "email")

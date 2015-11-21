@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import patterns, url
 
 urlpatterns = patterns('Gifts.views',
     url(r'^$', 'user_home', name='user_home'),
