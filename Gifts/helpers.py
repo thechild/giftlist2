@@ -5,7 +5,7 @@ from giftlist.settings import AMAZON_AFFILIATE_TAG
 from amazonify import amazonify
 from urlparse import urlparse
 from django.core.urlresolvers import reverse
-from Gifts.models import PersonEmail, Person
+from Gifts.models import PersonEmail, Person, Gift
 import datetime
 import os
 
