@@ -223,7 +223,7 @@ def reserve_gift(request, recipient_id, gift_id):
     recipient = get_object_or_404(Person, pk=recipient_id)
     gift = get_object_or_404(Gift, pk=gift_id)
 
-    success = false
+    success = False
 
     if gift.reserved_by is None:
         # unreserve any other gifts first
@@ -233,7 +233,7 @@ def reserve_gift(request, recipient_id, gift_id):
         gift.date_reserved = datetime.now()
         gift.save()
         messages.success(request, "You've successfully reserved the %s for %s!" % (gift.title, recipient.first_name))
-        success = true
+        success = True
     else:
         messages.error(request, 'Someone has already reserved that gift!')
 
