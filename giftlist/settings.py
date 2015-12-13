@@ -2,7 +2,7 @@ import os
 
 # Django settings for giftlist project.
 
-DEBUG = True
+DEBUG = False
 if 'DEBUG_APP' in os.environ:
     DEBUG = os.environ['DEBUG_APP']
 
