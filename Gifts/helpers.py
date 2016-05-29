@@ -5,11 +5,12 @@ from giftlist.settings import AMAZON_AFFILIATE_TAG
 from amazonify import amazonify
 from urlparse import urlparse
 from django.core.urlresolvers import reverse
-from Gifts.models import PersonEmail, Person
+from Gifts.models import PersonEmail, Person, Gift
 import datetime
 import os
 
-## email helper function ##
+
+# email helper function #
 def render_and_send_email(sender, recipient, subject, msg_type, link=''):
 
     from_email = "%s %s (via Gift Exchange) <%s>" % (sender.first_name, sender.last_name, sender.email)
@@ -38,29 +39,33 @@ def render_and_send_email(sender, recipient, subject, msg_type, link=''):
         print "%s" % text_content
 
     stored_email = PersonEmail(sender=sender,
-        recipient=recipient,
-        subject=subject,
-        text_body=text_content,
-        type_of_email=msg_type)
+                               recipient=recipient,
+                               subject=subject,
+                               text_body=text_content,
+                               type_of_email=msg_type)
     stored_email.save()
-    stored_email.date_sent = stored_email.date_published # this is in case we later want to publish and send at different times
+    stored_email.date_sent = stored_email.date_published  # this is in case we later want to publish and send at different times
     stored_email.save()
 
-## sends a signup email to recipient on behalf of sender ##
+
+# sends a signup email to recipient on behalf of sender #
 def send_signup_email(sender, recipient):
     subject = "What do you want for the holidays?"
-    sent_messages = PersonEmail.objects.filter(sender=sender, recipient=recipient, type_of_email__exact=PersonEmail.SIGNUP_EMAIL).order_by('-date_sent')
+    sent_messages = PersonEmail.objects.filter(sender=sender, recipient=recipient,
+                                               type_of_email__exact=PersonEmail.SIGNUP_EMAIL).order_by('-date_sent')
     if sent_messages.count() == 0 or sent_messages[0].date_sent.date() < datetime.date.today():
         render_and_send_email(sender, recipient, subject, PersonEmail.SIGNUP_EMAIL, recipient.signup_url())
 
-## sends an email to recipient requesting he/she add more gifts on behalf of sender ##
+
+# sends an email to recipient requesting he/she add more gifts on behalf of sender #
 def send_request_email(sender, recipient):
     subject = "Please add some gifts on Gift List!"
     # check to see if they've registered
     if recipient.login_user:
         # only let you send one a day - maybe should even make this a longer interval?
         # also note that this currently fails silently, telling the user an email was sent even if we didn't re-send
-        sent_messages = PersonEmail.objects.filter(sender=sender, recipient=recipient, type_of_email__exact=PersonEmail.REQUEST_EMAIL).order_by('-date_sent')
+        sent_messages = PersonEmail.objects.filter(sender=sender, recipient=recipient,
+                                                   type_of_email__exact=PersonEmail.REQUEST_EMAIL).order_by('-date_sent')
         print "sent_messages in send_request_email: %s" % sent_messages
         if sent_messages.count() == 0 or sent_messages[0].date_sent.date() < datetime.date.today():
             link = '%s%s' % (os.environ.get('BASE_IRI'), reverse('Gifts.views.user_home', None))
@@ -68,10 +73,13 @@ def send_request_email(sender, recipient):
     else:
         send_signup_email(sender, recipient)
 
-## sends an email to recipient letting him/her know that sender has added new gifts.  Sends a maximum of once a day ##
+
+# sends an email to recipient letting him/her know that sender has added new gifts.  Sends a maximum of once a day #
 def send_update_email(sender, recipient):
     # see if one's already been sent:
-    sent_messages = PersonEmail.objects.filter(sender=sender, recipient=recipient, type_of_email__exact=PersonEmail.GIFT_ADDED_EMAIL).order_by('-date_sent')
+    sent_messages = PersonEmail.objects.filter(sender=sender, recipient=recipient,
+                                               type_of_email__exact=PersonEmail.GIFT_ADDED_EMAIL
+                                               ).order_by('-date_sent')
     if sent_messages.count() == 0 or sent_messages[0].date_sent.date() < datetime.date.today():
         # we haven't sent a message today, so let's send one.
         subject = "I've added some gifts on Gift List"
@@ -80,11 +88,13 @@ def send_update_email(sender, recipient):
     else:
         print "A message was sent recently from %s to %s so we won't send another." % (sender, recipient)
 
+
 def send_all_update_emails(sender):
     recipients = Person.objects.filter(recipients=sender)
     for recipient in recipients:
         # if recipient.login_user: # only send these emails to people who have actually signed up
         send_update_email(sender, recipient)
+
 
 def clear_reserved_gifts(sender, recipient):
     gifts = Gift.objects.filter(recipient=recipient.pk, reserved_by=sender.pk)
@@ -92,6 +102,7 @@ def clear_reserved_gifts(sender, recipient):
         g.reserved_by = None
         g.date_reserved = None
     return gifts.count()
+
 
 def convert_link(link):
     new_link = None

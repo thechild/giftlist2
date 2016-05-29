@@ -4,20 +4,20 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from uuid import uuid4
 import os
-import signals
+
 
 # this should rarely run
 def get_person_from_user(user):
     try:
         # do we already have the user? If so, just return it
         p = Person.objects.get(login_user=user)
-    except ObjectDoesNotExist as dne:
+    except ObjectDoesNotExist:
         try:
             # now, let's check to see if someone has already added this email address
-            p = Person.objects.get(email = user.email)
+            p = Person.objects.get(email=user.email)
             p.login_user = user
             p.save()
-        except ObjectDoesNotExist as dne:
+        except ObjectDoesNotExist:
             # nope, let's create a brand new person
             p = Person()
             p.login_user = user
@@ -25,8 +25,9 @@ def get_person_from_user(user):
             p.last_name = user.last_name
             p.email = user.email
             p.save()
-    
+
     return p
+
 
 def clear_reserved_gifts(myself, recipient):
     for g in Gift.objects.filter(recipient=recipient).filter(reserved_by=myself):
@@ -37,21 +38,28 @@ def clear_reserved_gifts(myself, recipient):
         else:
             g.save()
 
+
 def get_reserved_gifts(myself, recipient):
     selected_gifts = Gift.objects.filter(recipient=recipient).filter(reserved_by=myself)
     return selected_gifts
 
+
 def make_uuid():
     return str(uuid4())
 
+
 class Person(models.Model):
-    login_user = models.ForeignKey(User, related_name='django user', blank=True, null=True, unique=True, on_delete=models.SET_NULL)
+    login_user = models.ForeignKey(User,
+                                   related_name='django user',
+                                   blank=True, null=True, unique=True,
+                                   on_delete=models.SET_NULL)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     creation_key = models.CharField(max_length=150, default=make_uuid)
     recipients = models.ManyToManyField("self", symmetrical=False)
-    invited_by = models.ForeignKey(User, related_name='invitees', blank=True, null=True)
+    invited_by = models.ForeignKey(User, related_name='invitees',
+                                   blank=True, null=True)
 
     def signup_url(self):
         return '%s%s' % (os.environ.get('BASE_IRI'), reverse('Gifts.views.new_user_signup', args=(self.creation_key,)))
@@ -71,6 +79,7 @@ class Person(models.Model):
     def __unicode__(self):
         return self.name()
 
+
 class Gift(models.Model):
     recipient = models.ForeignKey(Person)
     title = models.CharField(max_length=200)
@@ -84,6 +93,7 @@ class Gift(models.Model):
 
     def __unicode__(self):
         return '%s (%s)' % (self.title, self.recipient)
+
 
 class PersonEmail(models.Model):
     SIGNUP_EMAIL = 'SU'

@@ -33,7 +33,7 @@ def new_user_signup(request, user_key):
         person = Person()
     else:
         person = get_object_or_404(Person, creation_key__exact=user_key)
-    
+
     if request.method == 'POST':
         form = UserCreateForm(request.POST)
         if form.is_valid():
@@ -51,29 +51,30 @@ def new_user_signup(request, user_key):
     else:
         try:
             user = User.objects.get(email__exact=person.email)
-        except ObjectDoesNotExist as dne:
+        except ObjectDoesNotExist:
             user = None
 
         if user:
-            messages.error(request, "You've already created your account.  Please login below.  Your user name is '{{ user.username }}'.")
+            messages.error(request, ("You've already created your account.  Please login below.  "
+                                     "Your user name is '{{ user.username }}'."))
             return HttpResponseRedirect(reverse('django.contrib.auth.views.login'))
         else:
             form = UserCreateForm()
             form.initial = {'first_name': person.first_name, 'last_name': person.last_name, 'email': person.email}
-        
+
     return render(request, 'new_user.html', {'form': form})
 
 
 @login_required
 def user_home(request):
     myself = get_person_from_user(request.user)
-    gifts = Gift.objects.filter(recipient = myself).exclude(secret = True)
-    #people = Person.objects.all().exclude(pk = myself.pk) # will eventually replace this with something smarter
+    gifts = Gift.objects.filter(recipient=myself).exclude(secret=True)
+    # people = Person.objects.all().exclude(pk = myself.pk) # will eventually replace this with something smarter
     people = myself.recipients.all()
 
     people_gifts = {}
     for p in people:
-        g = Gift.objects.filter(recipient = p).filter(reserved_by = myself)
+        g = Gift.objects.filter(recipient=p).filter(reserved_by=myself)
         if g.count() > 0:
             people_gifts[p] = g
         else:
@@ -82,9 +83,9 @@ def user_home(request):
     analytics.page(request.user.id, 'giftlist', 'user_home')
 
     return render(request, "user_home.html", {
-        'person' : myself,
-        'gifts' : gifts,
-        'people_gifts' : people_gifts,
+        'person': myself,
+        'gifts': gifts,
+        'people_gifts': people_gifts,
         })
 
 
@@ -136,14 +137,15 @@ def add_gift(request, gift_id=None):
         add_title = 'Add a new gift to your list.'
         submit_text = 'Add'
 
-    add_description = "Enter the details of a gift you would like to receive. Note that you can't change this after you save it, since people will be able to immediately reserve it."
+    add_description = ("Enter the details of a gift you would like to receive. "
+                       "Note that you can't change this after you save it, since people will be able to immediately reserve it.")
 
     return render(request, 'add_item.html',
-        {'form': form,
-        'add_title': add_title,
-        'add_description': add_description,
-        'submit_text': submit_text,
-        'giftid': gift_id })
+                  {'form': form,
+                   'add_title': add_title,
+                   'add_description': add_description,
+                   'submit_text': submit_text,
+                   'giftid': gift_id })
 
 
 @login_required
@@ -182,9 +184,11 @@ def add_secret_gift(request, recipient_id):
         form = GiftForm()
 
     return render(request, 'add_item.html',
-        {'form': form,
-        'add_title': 'Add a new gift for %s' % recipient.name(),
-        'add_description': 'Enter the details of the gift you would like to get for %s.  No one besides you will ever see this information.' % recipient.name()})
+                  {'form': form,
+                   'add_title': 'Add a new gift for %s' % recipient.name(),
+                   'add_description': ('Enter the details of the gift you would like to get for %s.  '
+                                       'No one besides you will ever see this information.' % recipient.name())
+                   })
 
 
 @login_required
@@ -219,7 +223,7 @@ def reserve_gift(request, recipient_id, gift_id):
     recipient = get_object_or_404(Person, pk=recipient_id)
     gift = get_object_or_404(Gift, pk=gift_id)
 
-    success = false
+    success = False
 
     if gift.reserved_by is None:
         # unreserve any other gifts first
@@ -229,7 +233,7 @@ def reserve_gift(request, recipient_id, gift_id):
         gift.date_reserved = datetime.now()
         gift.save()
         messages.success(request, "You've successfully reserved the %s for %s!" % (gift.title, recipient.first_name))
-        success = true
+        success = True
     else:
         messages.error(request, 'Someone has already reserved that gift!')
 
@@ -274,7 +278,8 @@ def user_gift_request(request, user_id):
     myself = get_person_from_user(request.user)
     user = get_object_or_404(Person, pk=user_id)
     send_request_email(myself, user)
-    messages.success(request, "An email has been sent to %s asking them to add more gifts.  We'll let you know when they do." % user.name())
+    messages.success(request, ("An email has been sent to %s asking them to add more gifts.  "
+                               "We'll let you know when they do." % user.name()))
     analytics.track(request.user.id, 'Requested more Gifts', {
         'recipient_id': user.id,
         'recipient_name': user.name()
@@ -320,7 +325,7 @@ def add_person(request):
             new_person.invited_by = myself.login_user
             new_person.save()
             myself.recipients.add(new_person)
-            new_person.recipients.add(myself)  # let's start them off with one person on their list - this may lead to extra emails to them...
+            new_person.recipients.add(myself)  # let's start them off with one person on their list
             # send an email letting them know how to sign up:
             send_signup_email(myself, new_person)
             analytics.track(request.user.id, 'Invited a new Person', {
@@ -331,10 +336,12 @@ def add_person(request):
         form = PersonForm()
 
     analytics.page(request.user.id, 'giftlist', 'add_person')
-    return render(request,'add_item.html',
-        {'form': form,
-        'add_title': 'Add a new person you would like to give a gift to.',
-        'add_description': "By adding a new person, you can track what gift you'd like to give them.  This will also send them an email inviting them to join Gift Exchange so that you can see the gifts they want."})
+    return render(request, 'add_item.html',
+                  {'form': form,
+                   'add_title': 'Add a new person you would like to give a gift to.',
+                   'add_description': ("By adding a new person, you can track what gift you'd like to give them.  "
+                                       "This will also send them an email inviting them to join Gift Exchange "
+                                       "so that you can see the gifts they want.")})
 
 
 @login_required
@@ -394,7 +401,9 @@ def unfollow_person(request, person_id):
     if myself.recipients.filter(pk=person.pk).count() > 0:
         myself.recipients.remove(person)
         cleared_gifts = clear_reserved_gifts(myself, person)
-        messages.success(request, "Removed %s from your list, and unreserved %s gifts you had reserved for them." % (person.name(), len(cleared_gifts)))
+        messages.success(request,
+                         ("Removed %s from your list, and unreserved %s "
+                          "gifts you had reserved for them.") % (person.name(), len(cleared_gifts)))
         analytics.track(request.user.id, 'Unfollowed a Person', {
             'recipient_id': person.id,
             'total_recipients': myself.recipients.count()
@@ -406,7 +415,7 @@ def unfollow_person(request, person_id):
 
 @login_required
 def manage_account(request):
-    myself = get_person_from_user(request.user)
+    # myself = get_person_from_user(request.user)
     analytics.page(request.user.id, 'giftlist', 'manage_account')
     messages.warning(request, "Sorry, this isn't implemented yet.")
     return HttpResponseRedirect(reverse('Gifts.views.user_home'))
