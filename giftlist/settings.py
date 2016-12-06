@@ -76,7 +76,7 @@ EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PASSWORD']
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = 'http://cchild-giftlist.s3-website-us-east-1.amazonaws.com/'
+STATIC_URL = 'https://cchild-giftlist.s3-website-us-east-1.amazonaws.com/'
 
 SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
 STATIC_ROOT = ''
